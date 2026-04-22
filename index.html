@@ -390,40 +390,39 @@ const DG_PERIODO = {
 // Precios publicados Delphos — por período y cantidad de noches (3=mini, 4=extra)
 const DELPHOS = {
   A:{
-    n3:{'2p':450000,'3p':370000,'4p_st':340000,'4p_2a':395000,'5p':340000,'6p':340000},
-    n4:{'2p':600000,'3p':495000,'4p_st':450000,'4p_2a':520000,'5p':450000,'6p':450000},
+    n3:{'2p':{my:450000,mn:360000},'3p':{my:370000,mn:295000},'4p_st':{my:340000,mn:275000},'4p_2a':{my:395000,mn:315000},'5p':{my:340000,mn:275000},'6p':{my:340000,mn:275000}},
+    n4:{'2p':{my:600000,mn:480000},'3p':{my:495000,mn:395000},'4p_st':{my:450000,mn:360000},'4p_2a':{my:520000,mn:415000},'5p':{my:450000,mn:360000},'6p':{my:450000,mn:360000}},
   },
   B:{
-    n3:{'2p':495000,'3p':410000,'4p_st':375000,'4p_2a':465000,'5p':485000,'6p':485000},
-    n4:{'2p':660000,'3p':540000,'4p_st':495000,'4p_2a':570000,'5p':495000,'6p':495000},
+    n3:{'2p':{my:495000,mn:395000},'3p':{my:410000,mn:330000},'4p_st':{my:375000,mn:300000},'4p_2a':{my:465000,mn:345000},'5p':{my:485000,mn:390000},'6p':{my:485000,mn:390000}},
+    n4:{'2p':{my:660000,mn:530000},'3p':{my:540000,mn:430000},'4p_st':{my:495000,mn:395000},'4p_2a':{my:570000,mn:455000},'5p':{my:495000,mn:395000},'6p':{my:495000,mn:395000}},
   },
   C:{
-    n3:{'2p':525000,'3p':470000,'4p_st':420000,'4p_2a':465000,'5p':420000,'6p':420000},
-    n4:{'2p':690000,'3p':630000,'4p_st':565000,'4p_2a':615000,'5p':565000,'6p':565000},
+    n3:{'2p':{my:525000,mn:420000},'3p':{my:470000,mn:375000},'4p_st':{my:420000,mn:335000},'4p_2a':{my:465000,mn:375000},'5p':{my:420000,mn:335000},'6p':{my:420000,mn:335000}},
+    n4:{'2p':{my:690000,mn:550000},'3p':{my:630000,mn:505000},'4p_st':{my:565000,mn:450000},'4p_2a':{my:615000,mn:495000},'5p':{my:565000,mn:450000},'6p':{my:565000,mn:450000}},
   },
   D:{
-    n3:{'2p':525000,'3p':470000,'4p_st':420000,'4p_2a':465000,'5p':420000,'6p':420000},
-    n4:{'2p':690000,'3p':630000,'4p_st':565000,'4p_2a':615000,'5p':565000,'6p':565000},
+    n3:{'2p':{my:525000,mn:420000},'3p':{my:470000,mn:375000},'4p_st':{my:420000,mn:335000},'4p_2a':{my:465000,mn:375000},'5p':{my:420000,mn:335000},'6p':{my:420000,mn:335000}},
+    n4:{'2p':{my:690000,mn:550000},'3p':{my:630000,mn:505000},'4p_st':{my:565000,mn:450000},'4p_2a':{my:615000,mn:495000},'5p':{my:565000,mn:450000},'6p':{my:565000,mn:450000}},
   },
 };
 
-// Precios publicados Géminis — por período y cantidad de noches
 const GEMINIS = {
   A:{
-    n3:{'2p':515000,'3p':445000,'4p_ext':450000,'4p_int':400000,'5p':395000,'6p':390000},
-    n4:{'2p':690000,'3p':635000,'4p_ext':595000,'4p_int':530000,'5p':525000,'6p':520000},
+    n3:{'2p':{my:515000,mn:415000},'3p':{my:445000,mn:355000},'4p_ext':{my:450000,mn:355000},'4p_int':{my:400000,mn:320000},'5p':{my:395000,mn:315000},'6p':{my:390000,mn:310000}},
+    n4:{'2p':{my:690000,mn:550000},'3p':{my:635000,mn:510000},'4p_ext':{my:595000,mn:475000},'4p_int':{my:530000,mn:425000},'5p':{my:525000,mn:420000},'6p':{my:520000,mn:410000}},
   },
   B:{
-    n3:{'2p':570000,'3p':485000,'4p_ext':495000,'4p_int':440000,'5p':435000,'6p':420000},
-    n4:{'2p':762000,'3p':650000,'4p_ext':655000,'4p_int':580000,'5p':575000,'6p':570000},
+    n3:{'2p':{my:570000,mn:455000},'3p':{my:485000,mn:390000},'4p_ext':{my:495000,mn:395000},'4p_int':{my:440000,mn:350000},'5p':{my:435000,mn:345000},'6p':{my:420000,mn:335000}},
+    n4:{'2p':{my:762000,mn:610000},'3p':{my:650000,mn:520000},'4p_ext':{my:655000,mn:525000},'4p_int':{my:580000,mn:465000},'5p':{my:575000,mn:460000},'6p':{my:570000,mn:455000}},
   },
   C:{
-    n3:{'2p':595000,'3p':520000,'4p_ext':525000,'4p_int':485000,'5p':480000,'6p':475000},
-    n4:{'2p':790000,'3p':690000,'4p_ext':695000,'4p_int':640000,'5p':630000,'6p':620000},
+    n3:{'2p':{my:595000,mn:475000},'3p':{my:520000,mn:415000},'4p_ext':{my:525000,mn:420000},'4p_int':{my:485000,mn:390000},'5p':{my:480000,mn:385000},'6p':{my:475000,mn:375000}},
+    n4:{'2p':{my:790000,mn:635000},'3p':{my:690000,mn:552000},'4p_ext':{my:695000,mn:560000},'4p_int':{my:640000,mn:510000},'5p':{my:630000,mn:505000},'6p':{my:620000,mn:495000}},
   },
   D:{
-    n3:{'2p':595000,'3p':520000,'4p_ext':525000,'4p_int':485000,'5p':480000,'6p':475000},
-    n4:{'2p':790000,'3p':690000,'4p_ext':695000,'4p_int':640000,'5p':630000,'6p':620000},
+    n3:{'2p':{my:595000,mn:475000},'3p':{my:520000,mn:415000},'4p_ext':{my:525000,mn:420000},'4p_int':{my:485000,mn:390000},'5p':{my:480000,mn:385000},'6p':{my:475000,mn:375000}},
+    n4:{'2p':{my:790000,mn:635000},'3p':{my:690000,mn:552000},'4p_ext':{my:695000,mn:560000},'4p_int':{my:640000,mn:510000},'5p':{my:630000,mn:505000},'6p':{my:620000,mn:495000}},
   },
 };
 
@@ -638,13 +637,17 @@ function cotizar() {
     arr.forEach(({k,l}) => {
       if (tabla[k]) {
         const precioPubl = tabla[k];
-        const alojNeto = Math.round(precioPubl * 0.85);
-        const pasePorPersona = pases;
+        const alojNetoMY = Math.round(precioPubl.my * 0.85);
+        const alojNetoMN = Math.round(precioPubl.mn * 0.85);
+        const paseMY = pases;
+        const paseMN = PASES[s.tipo+'_'+s.tk]?.menor || 0;
         opciones.push({
           nombre: 'Delphos · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj: alojNeto, pases: pasePorPersona, precio: alojNeto+pasePorPersona,
-          precioPubl, tag:'dg', dormis:false,
+          aloj: alojNetoMY, alojMn: alojNetoMN,
+          pases: paseMY, pasesMn: paseMN,
+          precio: alojNetoMY+paseMY,
+          precioPubl: precioPubl.my, tag:'dg', dormis:false,
         });
       }
     });
@@ -658,13 +661,17 @@ function cotizar() {
     arr.forEach(({k,l}) => {
       if (tabla[k]) {
         const precioPubl = tabla[k];
-        const alojNeto2 = Math.round(precioPubl * 0.85);
-        const pasePorPersona2 = pases;
+        const alojNetoMY2 = Math.round(precioPubl.my * 0.85);
+        const alojNetoMN2 = Math.round(precioPubl.mn * 0.85);
+        const paseMY2 = pases;
+        const paseMN2 = PASES[s.tipo+'_'+s.tk]?.menor || 0;
         opciones.push({
           nombre: 'Géminis · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj: alojNeto2, pases: pasePorPersona2, precio: alojNeto2+pasePorPersona2,
-          precioPubl, tag:'dg', dormis:false,
+          aloj: alojNetoMY2, alojMn: alojNetoMN2,
+          pases: paseMY2, pasesMn: paseMN2,
+          precio: alojNetoMY2+paseMY2,
+          precioPubl: precioPubl.my, tag:'dg', dormis:false,
         });
       }
     });
@@ -695,6 +702,16 @@ function cotizar() {
           </div>
         </div>
         <div class="opt-desglose">
+          ${opt.tag==='dg' && pax.minor>0 ? `
+          <div class="opt-desglose-item">
+            <div class="dl">Mayor (aloj + pase)</div>
+            <div class="dv">${fmt(opt.aloj + opt.pases)}</div>
+          </div>
+          <div class="opt-desglose-item">
+            <div class="dl">Menor (aloj + pase)</div>
+            <div class="dv">${fmt((opt.alojMn||opt.aloj) + (opt.pasesMn||0))}</div>
+          </div>
+          ` : `
           <div class="opt-desglose-item">
             <div class="dl">Paquete</div>
             <div class="dv">${fmt(opt.aloj)}</div>
@@ -703,6 +720,7 @@ function cotizar() {
             <div class="dl">Pases</div>
             <div class="dv">${opt.pases > 0 ? fmt(opt.pases) : 'Sin pase'}</div>
           </div>
+          `}
         </div>
       `;
       grid.appendChild(card);
