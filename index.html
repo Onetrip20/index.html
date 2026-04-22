@@ -523,7 +523,7 @@ function addOpt(sel, val, label) {
 // ══════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════
-const fmt = n => '$'+Math.ceil(n).toLocaleString('es-AR');
+const fmt = n => '$'+(Math.ceil(n/10000)*10000).toLocaleString('es-AR');
 
 function getTecaDeptos(total) {
   if (total<=4) return [{k:'4e',l:'Studio 1 Baño (base 4)'},{k:'4d',l:'Dúplex 1 Baño (base 4)'}];
