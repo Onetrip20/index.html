@@ -554,10 +554,14 @@ function getPases(tipo, tk, paseAdult, paseMinor) {
   const key = tipo+'_'+tk;
   const p = PASES[key];
   if (!p) return 0;
-  let total = 0;
-  if (paseAdult!=='sin') total += (p[paseAdult]||p.comun||0) * pax.adult;
-  if (pax.minor>0 && paseMinor!=='sin') total += (p.menor||0) * pax.minor;
-  return total;
+  // Retorna precio del pase por persona (adulto) — el precio ya es unitario
+  if (paseAdult==='sin') return 0;
+  return p[paseAdult] || p.comun || 0;
+}
+
+function getPasesDesglose(tipo, tk, paseAdult, paseMinor) {
+  // Para el desglose en la card: precio pase adulto por persona
+  return getPases(tipo, tk, paseAdult, paseMinor);
 }
 
 function paseLabel(k) {
@@ -592,30 +596,34 @@ function cotizar() {
 
   let opciones = [];
 
-  // ── TECA
+  // ── TECA (precio publicado ya incluye pases — desglosamos)
   if (tipoSel==='teca' || tipoSel==='todos') {
     deptos.forEach(({k,l}) => {
       if (data[s.tk]?.[k]) {
-        const aloj = data[s.tk][k];
+        const precioTotal = data[s.tk][k];
+        const pasePorPersona = pases;
+        const paquetePorPersona = precioTotal - pasePorPersona;
         opciones.push({
           nombre: 'TECA · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj, pases, precio: aloj+pases,
+          aloj: paquetePorPersona, pases: pasePorPersona, precio: precioTotal,
           tag:'teca', dormis:false,
         });
       }
     });
   }
 
-  // ── TECA DORMIS
+  // ── TECA DORMIS (mismo que TECA pero $70.000 menos en el paquete)
   if (tipoSel==='dormis' || tipoSel==='todos') {
     deptos.forEach(({k,l}) => {
       if (data[s.tk]?.[k]) {
-        const aloj = data[s.tk][k] - 70000;
+        const precioTotal = data[s.tk][k] - 70000;
+        const pasePorPersona = pases;
+        const paquetePorPersona = precioTotal - pasePorPersona;
         opciones.push({
-          nombre: 'TECA Dormis · '+l,
+          nombre: 'TECA · '+l+' (Dormis)',
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj, pases, precio: aloj+pases,
+          aloj: paquetePorPersona, pases: pasePorPersona, precio: precioTotal,
           tag:'dormis', dormis:true,
         });
       }
@@ -631,10 +639,11 @@ function cotizar() {
       if (tabla[k]) {
         const precioPubl = tabla[k];
         const alojNeto = Math.round(precioPubl * 0.85);
+        const pasePorPersona = pases;
         opciones.push({
           nombre: 'Delphos · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj: alojNeto, pases, precio: alojNeto+pases,
+          aloj: alojNeto, pases: pasePorPersona, precio: alojNeto+pasePorPersona,
           precioPubl, tag:'dg', dormis:false,
         });
       }
@@ -649,11 +658,12 @@ function cotizar() {
     arr.forEach(({k,l}) => {
       if (tabla[k]) {
         const precioPubl = tabla[k];
-        const alojNeto = Math.round(precioPubl * 0.85);
+        const alojNeto2 = Math.round(precioPubl * 0.85);
+        const pasePorPersona2 = pases;
         opciones.push({
           nombre: 'Géminis · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj: alojNeto, pases, precio: alojNeto+pases,
+          aloj: alojNeto2, pases: pasePorPersona2, precio: alojNeto2+pasePorPersona2,
           precioPubl, tag:'dg', dormis:false,
         });
       }
