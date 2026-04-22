@@ -503,7 +503,7 @@ function init() {
       : 'Extraweek · 4 noches (sale lunes)';
 
     addOpt(selTipo, 'teca', `TECA · ${tipoLabel}`);
-    addOpt(selTipo, 'dormis', `TECA Dormis · ${tipoLabel} (−$70.000)`);
+    addOpt(selTipo, 'dormis', `Dormis · ${tipoLabel}`);
 
     const periodo = DG_PERIODO[s.dgk];
     if (periodo) {
@@ -523,7 +523,7 @@ function addOpt(sel, val, label) {
 // ══════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════
-const fmt = n => '$'+Math.round(n).toLocaleString('es-AR');
+const fmt = n => '$'+Math.ceil(n).toLocaleString('es-AR');
 
 function getTecaDeptos(total) {
   if (total<=4) return [{k:'4e',l:'Studio 1 Baño (base 4)'},{k:'4d',l:'Dúplex 1 Baño (base 4)'}];
@@ -624,7 +624,7 @@ function cotizar() {
         const paseMenor = PASES[s.tipo+'_'+s.tk]?.menor || 0;
         const paquetePorPersona = precioTotal - pasePorPersona;
         opciones.push({
-          nombre: 'TECA · '+l+' (Dormis)',
+          nombre: 'Dormis · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
           aloj: paquetePorPersona, alojMn: paquetePorPersona,
           pases: pasePorPersona, pasesMn: paseMenor,
@@ -643,8 +643,8 @@ function cotizar() {
     arr.forEach(({k,l}) => {
       if (tabla[k]) {
         const precioPubl = tabla[k];
-        const alojNetoMY = Math.round(precioPubl.my * 0.85);
-        const alojNetoMN = Math.round(precioPubl.mn * 0.85);
+        const alojNetoMY = Math.ceil(precioPubl.my * 0.85);
+        const alojNetoMN = Math.ceil(precioPubl.mn * 0.85);
         const paseMY = pases;
         const paseMN = PASES[s.tipo+'_'+s.tk]?.menor || 0;
         opciones.push({
@@ -667,8 +667,8 @@ function cotizar() {
     arr.forEach(({k,l}) => {
       if (tabla[k]) {
         const precioPubl = tabla[k];
-        const alojNetoMY2 = Math.round(precioPubl.my * 0.85);
-        const alojNetoMN2 = Math.round(precioPubl.mn * 0.85);
+        const alojNetoMY2 = Math.ceil(precioPubl.my * 0.85);
+        const alojNetoMN2 = Math.ceil(precioPubl.mn * 0.85);
         const paseMY2 = pases;
         const paseMN2 = PASES[s.tipo+'_'+s.tk]?.menor || 0;
         opciones.push({
