@@ -368,7 +368,19 @@ const PASES = {
 // Períodos: A=baja, B=media-baja, C=media-alta, D=vac.inv.
 // ══════════════════════════════════════════════════════
 
-// Mapeo fecha DG → período
+// Costos fijos (sin cama) por fecha — bus + transfer + seguro + coord + utilidad + comisión
+const COSTOS_FIJOS = {
+  // Miniweek
+  'mini_27/06': 516110, 'mini_04/07': 545068, 'mini_11/07': 548738,
+  'mini_18/07': 548738, 'mini_25/07': 548738, 'mini_01/08': 545068,
+  'mini_08/08': 545068, 'mini_15/08': 548738, 'mini_22/08': 545068,
+  'mini_29/08': 538948, 'mini_04/09': 516110,
+  // Extraweek
+  'extra_30/06': 513380, 'extra_07/07': 535775, 'extra_14/07': 540125,
+  'extra_21/07': 540125, 'extra_28/07': 535805, 'extra_04/08': 552118,
+  'extra_11/08': 535805, 'extra_18/08': 535805, 'extra_25/08': 535805,
+  'extra_01/09': 528605, 'extra_08/09': 513380,
+};
 const DG_PERIODO = {
   // Período A (baja): salidas 13/6, 20/6, 5/9, 12/9, 19/9
   '13/06':'A','20/06':'A','05/09':'A','12/09':'A','19/09':'A',
@@ -643,6 +655,7 @@ function cotizar() {
     arr.forEach(({k,l}) => {
       if (tabla[k]) {
         const precioPubl = tabla[k];
+        const costoFijo = COSTOS_FIJOS[s.tipo+'_'+s.tk] || 0;
         const alojNetoMY = Math.ceil(precioPubl.my * 0.85);
         const alojNetoMN = Math.ceil(precioPubl.mn * 0.85);
         const paseMY = pases;
@@ -650,9 +663,9 @@ function cotizar() {
         opciones.push({
           nombre: 'Delphos · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj: alojNetoMY, alojMn: alojNetoMN,
+          aloj: alojNetoMY + costoFijo, alojMn: alojNetoMN + costoFijo,
           pases: paseMY, pasesMn: paseMN,
-          precio: alojNetoMY+paseMY,
+          precio: alojNetoMY + costoFijo + paseMY,
           precioPubl: precioPubl.my, tag:'dg', dormis:false,
         });
       }
@@ -667,6 +680,7 @@ function cotizar() {
     arr.forEach(({k,l}) => {
       if (tabla[k]) {
         const precioPubl = tabla[k];
+        const costoFijo2 = COSTOS_FIJOS[s.tipo+'_'+s.tk] || 0;
         const alojNetoMY2 = Math.ceil(precioPubl.my * 0.85);
         const alojNetoMN2 = Math.ceil(precioPubl.mn * 0.85);
         const paseMY2 = pases;
@@ -674,9 +688,9 @@ function cotizar() {
         opciones.push({
           nombre: 'Géminis · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj: alojNetoMY2, alojMn: alojNetoMN2,
+          aloj: alojNetoMY2 + costoFijo2, alojMn: alojNetoMN2 + costoFijo2,
           pases: paseMY2, pasesMn: paseMN2,
-          precio: alojNetoMY2+paseMY2,
+          precio: alojNetoMY2 + costoFijo2 + paseMY2,
           precioPubl: precioPubl.my, tag:'dg', dormis:false,
         });
       }
