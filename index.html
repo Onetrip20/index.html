@@ -255,28 +255,7 @@ body *{visibility:hidden;}
 </div>
 
 <div class="card-title">Tipo de pase</div>
-<div class="grid2" style="margin-bottom:4px;">
-  <div class="fgroup">
-    <label>Pase adultos</label>
-    <div class="sel">
-      <select id="sel-pase-adult">
-        <option value="comun">Pase Común</option>
-        <option value="univers">Pase Universitario</option>
-        <option value="menor_cat">Pase Menor (categoría)</option>
-        <option value="sin">Sin pase</option>
-      </select>
-    </div>
-  </div>
-  <div class="fgroup">
-    <label>Pase menores</label>
-    <div class="sel">
-      <select id="sel-pase-minor" disabled>
-        <option value="menor">Pase Menor</option>
-        <option value="sin">Sin pase</option>
-      </select>
-    </div>
-  </div>
-</div>
+<div id="pases-container" style="margin-bottom:4px;display:flex;flex-direction:column;gap:8px;"></div>
 
 <button class="btn-quote" onclick="cotizar()">🔍 &nbsp; Cotizar</button>
 ```
@@ -482,7 +461,38 @@ function changePax(tipo, delta) {
   document.getElementById('val-minor').textContent = pax.minor;
   document.getElementById('val-total').textContent = total;
   document.getElementById('pax-hint').textContent = total+' persona'+(total>1?'s':'');
-  document.getElementById('sel-pase-minor').disabled = pax.minor===0;
+  renderPaseSelectors();
+}
+
+function renderPaseSelectors() {
+  const container = document.getElementById('pases-container');
+  container.innerHTML = '';
+  for (let i = 0; i < pax.adult; i++) {
+    container.innerHTML += `
+      <div class="fgroup">
+        <label>Adulto ${pax.adult > 1 ? i+1 : ''}</label>
+        <div class="sel">
+          <select id="pase-adult-${i}">
+            <option value="comun">Pase Común</option>
+            <option value="univers">Pase Universitario</option>
+            <option value="menor_cat">Pase Menor (categoría)</option>
+            <option value="sin">Sin pase</option>
+          </select>
+        </div>
+      </div>`;
+  }
+  for (let i = 0; i < pax.minor; i++) {
+    container.innerHTML += `
+      <div class="fgroup">
+        <label>Menor ${pax.minor > 1 ? i+1 : ''}</label>
+        <div class="sel">
+          <select id="pase-minor-${i}">
+            <option value="menor">Pase Menor</option>
+            <option value="sin">Sin pase</option>
+          </select>
+        </div>
+      </div>`;
+  }
 }
 
 // ══════════════════════════════════════════════════════
@@ -592,8 +602,6 @@ function tempBadgeClass(temp) {
 function cotizar() {
   const idx = document.getElementById('sel-fecha').value;
   const tipoSel = document.getElementById('sel-tipo').value;
-  const paseAdult = document.getElementById('sel-pase-adult').value;
-  const paseMinor = document.getElementById('sel-pase-minor').value;
   const total = pax.adult + pax.minor;
 
   if (idx===''||!tipoSel) { alert('Seleccioná fecha y tipo de semana.'); return; }
@@ -603,7 +611,25 @@ function cotizar() {
   const noches = s.tipo==='mini' ? 'n3' : 'n4';
   const periodo = DG_PERIODO[s.dgk];
   const deptos = getTecaDeptos(total);
-  const pases = getPases(s.tipo, s.tk, paseAdult, paseMinor);
+
+  // Leer pases individuales
+  const pasesAdultos = [];
+  for (let i = 0; i < pax.adult; i++) {
+    pasesAdultos.push(document.getElementById(`pase-adult-${i}`)?.value || 'comun');
+  }
+  const pasesMinores = [];
+  for (let i = 0; i < pax.minor; i++) {
+    pasesMinores.push(document.getElementById(`pase-minor-${i}`)?.value || 'menor');
+  }
+
+  const p = PASES[s.tipo+'_'+s.tk] || {};
+  const preciosPasesAdultos = pasesAdultos.map(pa => pa==='sin' ? 0 : (p[pa]||p.comun||0));
+  const preciosPasesMinores = pasesMinores.map(pm => pm==='sin' ? 0 : (p.menor||0));
+
+  const paseMY = preciosPasesAdultos.reduce((a,b)=>a+b,0) / (pax.adult||1);
+  const paseMN = pax.minor > 0 ? preciosPasesMinores.reduce((a,b)=>a+b,0) / pax.minor : 0;
+  const pases = paseMY;
+  const paseAdult = pasesAdultos[0] || 'comun';
 
   let opciones = [];
 
@@ -948,6 +974,7 @@ function generarPDF() {
 // ══════════════════════════════════════════════════════
 init();
 changePax('adult',0);
+renderPaseSelectors();
 
 // ══════════════════════════════════════════════════════
 // SUPABASE — Auth + Cotizaciones
