@@ -635,17 +635,17 @@ function cotizar() {
 
   let opciones = [];
 
+  const paseLabels = {comun:'', univers:' (Universitario)', menor_cat:' (Pase Menor)', sin:' (Sin pase)'};
+
   // ── TECA (precio publicado ya incluye pases — desglosamos)
   if (tipoSel==='teca' || tipoSel==='todos') {
     deptos.forEach(({k,l}) => {
       if (data[s.tk]?.[k]) {
         const precioTotal = data[s.tk][k];
-        // Precio paquete = precio total - pase del adulto 1 (referencia)
         const paquete = precioTotal - (preciosPasesAdultos[0]||0);
-        // Precio por cada pasajero
         const paxPrecios = [
-          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}`, paquete, pase:pp, total: paquete+pp})),
-          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}`, paquete, pase:pp, total: paquete+pp})),
+          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}${paseLabels[pasesAdultos[i]]||''}`, paquete, pase:pp, total: paquete+pp})),
+          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}${pasesMinores[i]==='sin'?' (Sin pase)':''}`, paquete, pase:pp, total: paquete+pp})),
         ];
         opciones.push({
           nombre: 'TECA · '+l,
@@ -663,8 +663,8 @@ function cotizar() {
         const precioTotal = data[s.tk][k] - 70000;
         const paquete = precioTotal - (preciosPasesAdultos[0]||0);
         const paxPrecios = [
-          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}`, paquete, pase:pp, total: paquete+pp})),
-          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}`, paquete, pase:pp, total: paquete+pp})),
+          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}${paseLabels[pasesAdultos[i]]||''}`, paquete, pase:pp, total: paquete+pp})),
+          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}${pasesMinores[i]==='sin'?' (Sin pase)':''}`, paquete, pase:pp, total: paquete+pp})),
         ];
         opciones.push({
           nombre: 'Dormis · '+l,
@@ -687,8 +687,8 @@ function cotizar() {
         const alojMY = Math.ceil(precioPubl.my * 0.85) + costoFijo;
         const alojMN = Math.ceil(precioPubl.mn * 0.85) + costoFijo;
         const paxPrecios = [
-          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}`, paquete:alojMY, pase:pp, total:alojMY+pp})),
-          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}`, paquete:alojMN, pase:pp, total:alojMN+pp})),
+          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}${paseLabels[pasesAdultos[i]]||''}`, paquete:alojMY, pase:pp, total:alojMY+pp})),
+          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}${pasesMinores[i]==='sin'?' (Sin pase)':''}`, paquete:alojMN, pase:pp, total:alojMN+pp})),
         ];
         opciones.push({
           nombre: 'Delphos · '+l,
@@ -711,8 +711,8 @@ function cotizar() {
         const alojMY2 = Math.ceil(precioPubl.my * 0.85) + costoFijo2;
         const alojMN2 = Math.ceil(precioPubl.mn * 0.85) + costoFijo2;
         const paxPrecios = [
-          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}`, paquete:alojMY2, pase:pp, total:alojMY2+pp})),
-          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}`, paquete:alojMN2, pase:pp, total:alojMN2+pp})),
+          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}${paseLabels[pasesAdultos[i]]||''}`, paquete:alojMY2, pase:pp, total:alojMY2+pp})),
+          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}${pasesMinores[i]==='sin'?' (Sin pase)':''}`, paquete:alojMN2, pase:pp, total:alojMN2+pp})),
         ];
         opciones.push({
           nombre: 'Géminis · '+l,
