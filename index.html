@@ -767,7 +767,7 @@ function cotizar() {
 
   // Guardar para PDF
   const nombreCliente = document.getElementById('nombre-cliente').value.trim();
-  ultimaCotizacion = { salida: s, opciones, paseAdult, totalPax: total, nombreCliente };
+  ultimaCotizacion = { salida: s, opciones, paseAdult, totalPax: total, nombreCliente, paxSnap: {adult: pax.adult, minor: pax.minor} };
   // Guardar en Supabase
   guardarCotizacion(s, opciones, paseAdult, total, nombreCliente);
 }
@@ -779,7 +779,8 @@ let ultimaCotizacion = null;
 
 function generarPDF() {
   if (!ultimaCotizacion) return;
-  const { salida, opciones, paseAdult, totalPax } = ultimaCotizacion;
+  const { salida, opciones, paseAdult, totalPax, nombreCliente, paxSnap } = ultimaCotizacion;
+  const pax = paxSnap;
 
   const tipoSemana = salida.tipo === 'mini' ? 'Miniweek (3 noches)' : 'Extraweek (4 noches)';
   const { nombreCliente } = ultimaCotizacion;
@@ -795,14 +796,30 @@ function generarPDF() {
       .filter(Boolean)
       .join('<br>');
 
-  const filas = opciones.map(opt => `
+  const filas = opciones.map(opt => {
+    if (pax.minor > 0) {
+      return `
+    <tr>
+      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-weight:700;font-size:12px;" rowspan="2">${opt.nombre}</td>
+      <td style="padding:10px 16px;border-bottom:1px dashed #eee;font-size:11px;color:#666;">Mayor · ${fmt(opt.aloj)}</td>
+      <td style="padding:10px 16px;border-bottom:1px dashed #eee;font-size:11px;color:#666;">${fmt(opt.pases)}</td>
+      <td style="padding:10px 16px;border-bottom:1px dashed #eee;font-weight:900;font-size:14px;color:#FF6264;text-align:right;">${fmt(opt.aloj + opt.pases)}</td>
+    </tr>
+    <tr>
+      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-size:11px;color:#666;">Menor · ${fmt(opt.alojMn||opt.aloj)}</td>
+      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-size:11px;color:#666;">${fmt(opt.pasesMn||0)}</td>
+      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-weight:900;font-size:14px;color:#7468D9;text-align:right;">${fmt((opt.alojMn||opt.aloj) + (opt.pasesMn||0))}</td>
+    </tr>`;
+    } else {
+      return `
     <tr>
       <td style="padding:12px 16px;border-bottom:1px solid #eee;font-weight:700;font-size:13px;">${opt.nombre}</td>
       <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:12px;color:#666;">${fmt(opt.aloj)}</td>
       <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:12px;color:#666;">${opt.pases > 0 ? fmt(opt.pases) : '—'}</td>
       <td style="padding:12px 16px;border-bottom:1px solid #eee;font-weight:900;font-size:15px;color:#FF6264;text-align:right;">${fmt(opt.precio)}</td>
-    </tr>
-  `).join('');
+    </tr>`;
+    }
+  }).join('');
 
   const html = `
 <div style="font-family:'Montserrat',sans-serif;color:#1a1a2e;max-width:700px;margin:0 auto;">
