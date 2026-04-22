@@ -623,13 +623,15 @@ function cotizar() {
   }
 
   const p = PASES[s.tipo+'_'+s.tk] || {};
+  // Precio de pase por cada pasajero individual
   const preciosPasesAdultos = pasesAdultos.map(pa => pa==='sin' ? 0 : (p[pa]||p.comun||0));
   const preciosPasesMinores = pasesMinores.map(pm => pm==='sin' ? 0 : (p.menor||0));
 
-  const paseMY = preciosPasesAdultos.reduce((a,b)=>a+b,0) / (pax.adult||1);
-  const paseMN = pax.minor > 0 ? preciosPasesMinores.reduce((a,b)=>a+b,0) / pax.minor : 0;
-  const pases = paseMY;
+  // Para el desglose principal usamos el pasajero 1 como referencia
   const paseAdult = pasesAdultos[0] || 'comun';
+  const pases = preciosPasesAdultos[0] || 0;
+  const paseMN = preciosPasesMinores[0] || 0;
+  const paseMY = pases;
 
   let opciones = [];
 
@@ -638,36 +640,36 @@ function cotizar() {
     deptos.forEach(({k,l}) => {
       if (data[s.tk]?.[k]) {
         const precioTotal = data[s.tk][k];
-        const pasePorPersona = pases;
-        const paseMenor = PASES[s.tipo+'_'+s.tk]?.menor || 0;
-        const paquetePorPersona = precioTotal - pasePorPersona;
+        // Precio paquete = precio total - pase del adulto 1 (referencia)
+        const paquete = precioTotal - (preciosPasesAdultos[0]||0);
+        // Precio por cada pasajero
+        const paxPrecios = [
+          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}`, paquete, pase:pp, total: paquete+pp})),
+          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}`, paquete, pase:pp, total: paquete+pp})),
+        ];
         opciones.push({
           nombre: 'TECA · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj: paquetePorPersona, alojMn: paquetePorPersona,
-          pases: pasePorPersona, pasesMn: paseMenor,
-          precio: precioTotal,
-          tag:'teca', dormis:false,
+          paxPrecios, tag:'teca',
         });
       }
     });
   }
 
-  // ── TECA DORMIS (mismo que TECA pero $70.000 menos en el paquete)
+  // ── TECA DORMIS
   if (tipoSel==='dormis' || tipoSel==='todos') {
     deptos.forEach(({k,l}) => {
       if (data[s.tk]?.[k]) {
         const precioTotal = data[s.tk][k] - 70000;
-        const pasePorPersona = pases;
-        const paseMenor = PASES[s.tipo+'_'+s.tk]?.menor || 0;
-        const paquetePorPersona = precioTotal - pasePorPersona;
+        const paquete = precioTotal - (preciosPasesAdultos[0]||0);
+        const paxPrecios = [
+          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}`, paquete, pase:pp, total: paquete+pp})),
+          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}`, paquete, pase:pp, total: paquete+pp})),
+        ];
         opciones.push({
           nombre: 'Dormis · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj: paquetePorPersona, alojMn: paquetePorPersona,
-          pases: pasePorPersona, pasesMn: paseMenor,
-          precio: precioTotal,
-          tag:'dormis', dormis:true,
+          paxPrecios, tag:'dormis',
         });
       }
     });
@@ -682,17 +684,16 @@ function cotizar() {
       if (tabla[k]) {
         const precioPubl = tabla[k];
         const costoFijo = COSTOS_FIJOS[s.tipo+'_'+s.tk] || 0;
-        const alojNetoMY = Math.ceil(precioPubl.my * 0.85);
-        const alojNetoMN = Math.ceil(precioPubl.mn * 0.85);
-        const paseMY = pases;
-        const paseMN = PASES[s.tipo+'_'+s.tk]?.menor || 0;
+        const alojMY = Math.ceil(precioPubl.my * 0.85) + costoFijo;
+        const alojMN = Math.ceil(precioPubl.mn * 0.85) + costoFijo;
+        const paxPrecios = [
+          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}`, paquete:alojMY, pase:pp, total:alojMY+pp})),
+          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}`, paquete:alojMN, pase:pp, total:alojMN+pp})),
+        ];
         opciones.push({
           nombre: 'Delphos · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj: alojNetoMY + costoFijo, alojMn: alojNetoMN + costoFijo,
-          pases: paseMY, pasesMn: paseMN,
-          precio: alojNetoMY + costoFijo + paseMY,
-          precioPubl: precioPubl.my, tag:'dg', dormis:false,
+          paxPrecios, tag:'dg',
         });
       }
     });
@@ -707,17 +708,16 @@ function cotizar() {
       if (tabla[k]) {
         const precioPubl = tabla[k];
         const costoFijo2 = COSTOS_FIJOS[s.tipo+'_'+s.tk] || 0;
-        const alojNetoMY2 = Math.ceil(precioPubl.my * 0.85);
-        const alojNetoMN2 = Math.ceil(precioPubl.mn * 0.85);
-        const paseMY2 = pases;
-        const paseMN2 = PASES[s.tipo+'_'+s.tk]?.menor || 0;
+        const alojMY2 = Math.ceil(precioPubl.my * 0.85) + costoFijo2;
+        const alojMN2 = Math.ceil(precioPubl.mn * 0.85) + costoFijo2;
+        const paxPrecios = [
+          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}`, paquete:alojMY2, pase:pp, total:alojMY2+pp})),
+          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}`, paquete:alojMN2, pase:pp, total:alojMN2+pp})),
+        ];
         opciones.push({
           nombre: 'Géminis · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj: alojNetoMY2 + costoFijo2, alojMn: alojNetoMN2 + costoFijo2,
-          pases: paseMY2, pasesMn: paseMN2,
-          precio: alojNetoMY2 + costoFijo2 + paseMY2,
-          precioPubl: precioPubl.my, tag:'dg', dormis:false,
+          paxPrecios, tag:'dg',
         });
       }
     });
@@ -736,59 +736,34 @@ function cotizar() {
       const best = opt.precio===minP;
       const card = document.createElement('div');
       card.className = 'opt-card'+(best?' best':'');
+      const precioRef = opt.paxPrecios[0]?.total || 0;
       card.innerHTML = `
         <div class="opt-top">
           <div>
             <div class="opt-name">${opt.nombre}</div>
             <div class="opt-type">${opt.tipo} · ${s.dia} ${s.salida}/2026 · ${s.temp}</div>
           </div>
-          <div class="opt-price">
-            ${pax.minor>0 ? `
-              <div style="font-size:11px;color:#aaa;text-align:right;margin-bottom:2px;">por persona · IVA incl.</div>
-              <div style="display:flex;gap:12px;justify-content:flex-end;">
-                <div style="text-align:right;">
-                  <div style="font-size:9px;color:#aaa;font-weight:700;text-transform:uppercase;">Mayor</div>
-                  <div style="font-size:18px;font-weight:900;color:#FF6264;">${fmt(opt.aloj + opt.pases)}</div>
-                </div>
-                <div style="text-align:right;">
-                  <div style="font-size:9px;color:#aaa;font-weight:700;text-transform:uppercase;">Menor</div>
-                  <div style="font-size:18px;font-weight:900;color:#7468D9;">${fmt((opt.alojMn||opt.aloj) + (opt.pasesMn||0))}</div>
-                </div>
+          <div class="opt-price" style="text-align:right;flex-shrink:0;">
+            ${opt.paxPrecios.map(pp => `
+              <div style="display:flex;justify-content:flex-end;align-items:baseline;gap:6px;margin-bottom:2px;">
+                <span style="font-size:9px;color:#aaa;font-weight:700;text-transform:uppercase;">${pp.label.trim()}</span>
+                <span style="font-size:18px;font-weight:900;color:#FF6264;">${fmt(pp.total)}</span>
               </div>
-            ` : `
-              <div class="price">${fmt(opt.precio)}</div>
-              <div class="price-label">por persona · IVA incl.</div>
-            `}
+            `).join('')}
+            <div style="font-size:8px;color:#aaa;text-align:right;margin-top:2px;">por persona · IVA incl.</div>
           </div>
         </div>
         <div class="opt-desglose">
-          ${pax.minor>0 ? `
-          <div class="opt-desglose-item">
-            <div class="dl">Paquete mayor</div>
-            <div class="dv">${fmt(opt.aloj)}</div>
-          </div>
-          <div class="opt-desglose-item">
-            <div class="dl">Pase mayor</div>
-            <div class="dv">${opt.pases > 0 ? fmt(opt.pases) : 'Sin pase'}</div>
-          </div>
-          <div class="opt-desglose-item">
-            <div class="dl">Paquete menor</div>
-            <div class="dv">${fmt(opt.alojMn||opt.aloj)}</div>
-          </div>
-          <div class="opt-desglose-item">
-            <div class="dl">Pase menor</div>
-            <div class="dv">${opt.pasesMn > 0 ? fmt(opt.pasesMn) : 'Sin pase'}</div>
-          </div>
-          ` : `
-          <div class="opt-desglose-item">
-            <div class="dl">Paquete</div>
-            <div class="dv">${fmt(opt.aloj)}</div>
-          </div>
-          <div class="opt-desglose-item">
-            <div class="dl">Pases</div>
-            <div class="dv">${opt.pases > 0 ? fmt(opt.pases) : 'Sin pase'}</div>
-          </div>
-          `}
+          ${opt.paxPrecios.map(pp => `
+            <div class="opt-desglose-item" style="min-width:calc(50% - 4px);">
+              <div class="dl">${pp.label.trim()} · Paquete</div>
+              <div class="dv">${fmt(pp.paquete)}</div>
+            </div>
+            <div class="opt-desglose-item" style="min-width:calc(50% - 4px);">
+              <div class="dl">${pp.label.trim()} · Pase</div>
+              <div class="dv">${pp.pase > 0 ? fmt(pp.pase) : 'Sin pase'}</div>
+            </div>
+          `).join('')}
         </div>
       `;
       grid.appendChild(card);
@@ -836,28 +811,13 @@ function generarPDF() {
       .join('<br>');
 
   const filas = opciones.map(opt => {
-    if (pax.minor > 0) {
-      return `
+    return opt.paxPrecios.map((pp, i) => `
     <tr>
-      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-weight:700;font-size:12px;" rowspan="2">${opt.nombre}</td>
-      <td style="padding:10px 16px;border-bottom:1px dashed #eee;font-size:11px;color:#666;">Mayor · ${fmt(opt.aloj)}</td>
-      <td style="padding:10px 16px;border-bottom:1px dashed #eee;font-size:11px;color:#666;">${fmt(opt.pases)}</td>
-      <td style="padding:10px 16px;border-bottom:1px dashed #eee;font-weight:900;font-size:14px;color:#FF6264;text-align:right;">${fmt(opt.aloj + opt.pases)}</td>
-    </tr>
-    <tr>
-      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-size:11px;color:#666;">Menor · ${fmt(opt.alojMn||opt.aloj)}</td>
-      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-size:11px;color:#666;">${fmt(opt.pasesMn||0)}</td>
-      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-weight:900;font-size:14px;color:#7468D9;text-align:right;">${fmt((opt.alojMn||opt.aloj) + (opt.pasesMn||0))}</td>
-    </tr>`;
-    } else {
-      return `
-    <tr>
-      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-weight:700;font-size:13px;">${opt.nombre}</td>
-      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:12px;color:#666;">${fmt(opt.aloj)}</td>
-      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-size:12px;color:#666;">${opt.pases > 0 ? fmt(opt.pases) : '—'}</td>
-      <td style="padding:12px 16px;border-bottom:1px solid #eee;font-weight:900;font-size:15px;color:#FF6264;text-align:right;">${fmt(opt.precio)}</td>
-    </tr>`;
-    }
+      ${i===0 ? `<td style="padding:10px 16px;border-bottom:1px solid #eee;font-weight:700;font-size:12px;" rowspan="${opt.paxPrecios.length}">${opt.nombre}</td>` : ''}
+      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-size:11px;color:#666;">${pp.label.trim()} · ${fmt(pp.paquete)}</td>
+      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-size:11px;color:#666;">${pp.pase > 0 ? fmt(pp.pase) : '—'}</td>
+      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-weight:900;font-size:14px;color:#FF6264;text-align:right;">${fmt(pp.total)}</td>
+    </tr>`).join('');
   }).join('');
 
   const html = `
