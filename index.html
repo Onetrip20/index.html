@@ -78,7 +78,7 @@ select:disabled{opacity:.35;cursor:not-allowed;}
 .opt-price{text-align:right;flex-shrink:0;}
 .opt-price .price{font-size:22px;font-weight:900;color:#FF6264;line-height:1;}
 .opt-price .price-label{font-size:8px;color:#aaa;margin-top:2px;}
-.opt-desglose{display:flex;gap:8px;border-top:1px solid #e2e4ec;padding-top:10px;}
+.opt-desglose{display:flex;flex-wrap:wrap;gap:8px;border-top:1px solid #e2e4ec;padding-top:10px;}
 .opt-desglose-item{flex:1;background:#f2f3f7;border-radius:8px;padding:8px 10px;}
 .opt-desglose-item .dl{font-size:8px;color:#aaa;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
 .opt-desglose-item .dv{font-size:12px;font-weight:800;color:#1a1a2e;}
@@ -601,11 +601,14 @@ function cotizar() {
       if (data[s.tk]?.[k]) {
         const precioTotal = data[s.tk][k];
         const pasePorPersona = pases;
+        const paseMenor = PASES[s.tipo+'_'+s.tk]?.menor || 0;
         const paquetePorPersona = precioTotal - pasePorPersona;
         opciones.push({
           nombre: 'TECA · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj: paquetePorPersona, pases: pasePorPersona, precio: precioTotal,
+          aloj: paquetePorPersona, alojMn: paquetePorPersona,
+          pases: pasePorPersona, pasesMn: paseMenor,
+          precio: precioTotal,
           tag:'teca', dormis:false,
         });
       }
@@ -618,11 +621,14 @@ function cotizar() {
       if (data[s.tk]?.[k]) {
         const precioTotal = data[s.tk][k] - 70000;
         const pasePorPersona = pases;
+        const paseMenor = PASES[s.tipo+'_'+s.tk]?.menor || 0;
         const paquetePorPersona = precioTotal - pasePorPersona;
         opciones.push({
           nombre: 'TECA · '+l+' (Dormis)',
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
-          aloj: paquetePorPersona, pases: pasePorPersona, precio: precioTotal,
+          aloj: paquetePorPersona, alojMn: paquetePorPersona,
+          pases: pasePorPersona, pasesMn: paseMenor,
+          precio: precioTotal,
           tag:'dormis', dormis:true,
         });
       }
@@ -697,19 +703,41 @@ function cotizar() {
             <div class="opt-type">${opt.tipo} · ${s.dia} ${s.salida}/2026 · ${s.temp}</div>
           </div>
           <div class="opt-price">
-            <div class="price">${fmt(opt.precio)}</div>
-            <div class="price-label">tarifa total por persona · IVA incl.</div>
+            ${pax.minor>0 ? `
+              <div style="font-size:11px;color:#aaa;text-align:right;margin-bottom:2px;">por persona · IVA incl.</div>
+              <div style="display:flex;gap:12px;justify-content:flex-end;">
+                <div style="text-align:right;">
+                  <div style="font-size:9px;color:#aaa;font-weight:700;text-transform:uppercase;">Mayor</div>
+                  <div style="font-size:18px;font-weight:900;color:#FF6264;">${fmt(opt.aloj + opt.pases)}</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:9px;color:#aaa;font-weight:700;text-transform:uppercase;">Menor</div>
+                  <div style="font-size:18px;font-weight:900;color:#7468D9;">${fmt((opt.alojMn||opt.aloj) + (opt.pasesMn||0))}</div>
+                </div>
+              </div>
+            ` : `
+              <div class="price">${fmt(opt.precio)}</div>
+              <div class="price-label">por persona · IVA incl.</div>
+            `}
           </div>
         </div>
         <div class="opt-desglose">
-          ${opt.tag==='dg' && pax.minor>0 ? `
+          ${pax.minor>0 ? `
           <div class="opt-desglose-item">
-            <div class="dl">Mayor (aloj + pase)</div>
-            <div class="dv">${fmt(opt.aloj + opt.pases)}</div>
+            <div class="dl">Paquete mayor</div>
+            <div class="dv">${fmt(opt.aloj)}</div>
           </div>
           <div class="opt-desglose-item">
-            <div class="dl">Menor (aloj + pase)</div>
-            <div class="dv">${fmt((opt.alojMn||opt.aloj) + (opt.pasesMn||0))}</div>
+            <div class="dl">Pase mayor</div>
+            <div class="dv">${opt.pases > 0 ? fmt(opt.pases) : 'Sin pase'}</div>
+          </div>
+          <div class="opt-desglose-item">
+            <div class="dl">Paquete menor</div>
+            <div class="dv">${fmt(opt.alojMn||opt.aloj)}</div>
+          </div>
+          <div class="opt-desglose-item">
+            <div class="dl">Pase menor</div>
+            <div class="dv">${opt.pasesMn > 0 ? fmt(opt.pasesMn) : 'Sin pase'}</div>
           </div>
           ` : `
           <div class="opt-desglose-item">
