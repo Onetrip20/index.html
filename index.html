@@ -147,7 +147,7 @@ body *{visibility:hidden;}
 <div id="login-screen" class="login-screen">
   <div class="login-box">
     <div class="login-logo">
-      <div style="font-size:28px;font-weight:900;color:#FF6264;"><img src="https://onetrip20.github.io/index.html/Logo_One_Trip_1.png" style="height:70px;width:auto;display:block;"/></div>
+      <div style="font-size:28px;font-weight:900;color:#FF6264;">Ône<br>TRIP</div>
     </div>
     <div class="login-title">Cotizador Las Leñas 2026</div>
     <div class="login-sub" id="login-sub">Ingresá con tu cuenta</div>
@@ -180,7 +180,7 @@ body *{visibility:hidden;}
 
 <div class="hdr">
   <div class="logo">
-    <div style="font-size:18px;font-weight:900;color:white;"><img src="https://onetrip20.github.io/index.html/Logo_One_Trip_1.png" style="height:70px;width:auto;display:block;"/></div>
+    <div style="font-size:18px;font-weight:900;color:white;">Ône<br>TRIP</div>
   </div>
   <div class="hdr-right">
     <div class="sub">Cotizador · Temporada 2026</div>
@@ -647,16 +647,45 @@ function cotizar() {
 
   const paseLabels = {comun:'', univers:' (Universitario)', menor_cat:' (Pase Menor)', sin:' (Sin pase)'};
 
+  // Consolidar pasajeros: si todos los adultos tienen el mismo pase, mostrar una sola línea
+  function buildPaxPrecios(alojMY, alojMN) {
+    const rows = [];
+    // Adultos — agrupar si todos tienen el mismo pase
+    const todasIguales = pasesAdultos.every(p => p === pasesAdultos[0]);
+    if (todasIguales) {
+      const pp = preciosPasesAdultos[0] || 0;
+      const label = 'Adulto' + (paseLabels[pasesAdultos[0]] || '');
+      rows.push({label, paquete: alojMY, pase: pp, total: alojMY + pp});
+    } else {
+      pasesAdultos.forEach((pa, i) => {
+        const pp = preciosPasesAdultos[i] || 0;
+        rows.push({label: 'Adulto ' + (i+1) + (paseLabels[pa]||''), paquete: alojMY, pase: pp, total: alojMY + pp});
+      });
+    }
+    // Menores — siempre una sola línea si todos tienen el mismo pase
+    if (pax.minor > 0) {
+      const todasMenoresIguales = pasesMinores.every(p => p === pasesMinores[0]);
+      if (todasMenoresIguales) {
+        const pp = preciosPasesMinores[0] || 0;
+        const label = 'Menor' + (pasesMinores[0]==='sin' ? ' (Sin pase)' : '');
+        rows.push({label, paquete: alojMN, pase: pp, total: alojMN + pp});
+      } else {
+        pasesMinores.forEach((pm, i) => {
+          const pp = preciosPasesMinores[i] || 0;
+          rows.push({label: 'Menor ' + (i+1) + (pm==='sin'?' (Sin pase)':''), paquete: alojMN, pase: pp, total: alojMN + pp});
+        });
+      }
+    }
+    return rows;
+  }
+
   // ── TECA (precio publicado ya incluye pases — desglosamos)
   if (tipoSel==='teca' || tipoSel==='todos') {
     deptos.forEach(({k,l}) => {
       if (data[s.tk]?.[k]) {
         const precioTotal = data[s.tk][k];
         const paquete = precioTotal - (preciosPasesAdultos[0]||0);
-        const paxPrecios = [
-          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}${paseLabels[pasesAdultos[i]]||''}`, paquete, pase:pp, total: paquete+pp})),
-          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}${pasesMinores[i]==='sin'?' (Sin pase)':''}`, paquete, pase:pp, total: paquete+pp})),
-        ];
+        const paxPrecios = buildPaxPrecios(paquete, paquete);
         opciones.push({
           nombre: 'TECA · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
@@ -672,10 +701,7 @@ function cotizar() {
       if (data[s.tk]?.[k]) {
         const precioTotal = data[s.tk][k] - 70000;
         const paquete = precioTotal - (preciosPasesAdultos[0]||0);
-        const paxPrecios = [
-          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}${paseLabels[pasesAdultos[i]]||''}`, paquete, pase:pp, total: paquete+pp})),
-          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}${pasesMinores[i]==='sin'?' (Sin pase)':''}`, paquete, pase:pp, total: paquete+pp})),
-        ];
+        const paxPrecios = buildPaxPrecios(paquete, paquete);
         opciones.push({
           nombre: 'Dormis · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
@@ -696,10 +722,7 @@ function cotizar() {
         const costoFijo = COSTOS_FIJOS[s.tipo+'_'+s.tk] || 0;
         const alojMY = Math.ceil(precioPubl.my * 0.85) + costoFijo;
         const alojMN = Math.ceil(precioPubl.mn * 0.85) + costoFijo;
-        const paxPrecios = [
-          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}${paseLabels[pasesAdultos[i]]||''}`, paquete:alojMY, pase:pp, total:alojMY+pp})),
-          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}${pasesMinores[i]==='sin'?' (Sin pase)':''}`, paquete:alojMN, pase:pp, total:alojMN+pp})),
-        ];
+        const paxPrecios = buildPaxPrecios(alojMY, alojMN);
         opciones.push({
           nombre: 'Delphos · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
@@ -720,10 +743,7 @@ function cotizar() {
         const costoFijo2 = COSTOS_FIJOS[s.tipo+'_'+s.tk] || 0;
         const alojMY2 = Math.ceil(precioPubl.my * 0.85) + costoFijo2;
         const alojMN2 = Math.ceil(precioPubl.mn * 0.85) + costoFijo2;
-        const paxPrecios = [
-          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}${paseLabels[pasesAdultos[i]]||''}`, paquete:alojMY2, pase:pp, total:alojMY2+pp})),
-          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}${pasesMinores[i]==='sin'?' (Sin pase)':''}`, paquete:alojMN2, pase:pp, total:alojMN2+pp})),
-        ];
+        const paxPrecios = buildPaxPrecios(alojMY2, alojMN2);
         opciones.push({
           nombre: 'Géminis · '+l,
           tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
