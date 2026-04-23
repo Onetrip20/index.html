@@ -865,7 +865,8 @@ function generarPDF() {
 
 ```
 <!-- CLIENTE -->
-${nombreCliente ? `<div style="background:#fff0f0;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+${nombreCliente ? '<div style="background:#fff0f0;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;"><div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#FF6264;">Para:</div><div style="font-size:16px;font-weight:900;">'+nombreCliente+'</div></div>' : ''}
+
   <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#FF6264;">Para:</div>
   <div style="font-size:16px;font-weight:900;">${nombreCliente}</div>
 </div>` : ''}
