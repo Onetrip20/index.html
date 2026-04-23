@@ -816,91 +816,11 @@ function generarPDF() {
   h += '<div style="background:#fff8f8;border:1px solid #ffcccc;border-radius:10px;padding:14px;margin-bottom:12px;"><div style="font-size:7px;font-weight:900;color:#FF6264;margin-bottom:8px;">QUE INCLUYE</div>';
   h += '<div style="font-size:10px;color:#555;line-height:1.8;">Bus coche cama con cena y desayuno<br>Alojamiento segun seleccion<br>Medios de elevacion segun categoria<br>Seguro del viajero<br>Coordinador permanente</div></div>';
   h += '<div style="font-size:8px;color:#aaa;">Precios por persona con IVA. Sujeto a disponibilidad.</div></div>';
-  h += '<div style="background:#FF6264;padding:10px 28px;display:flex;justify-content:space-between;align-items:center;"><div style="font-weight:900;color:white;">one TRIP</div><div style="color:rgba(255,255,255,.75);font-size:8px;">www.onetrip.com</div><div style="color:#FFC630;font-size:8px;font-weight:700;">y no paras de via​​​​​​​​​​​​​​​​
-
-
-// ══════════════════════════════════════════════════════
-init();
-changePax('adult',0);
-renderPaseSelectors();
-
-// ══════════════════════════════════════════════════════
-// SUPABASE — Auth + Cotizaciones
-// ══════════════════════════════════════════════════════
-async function checkSession() {
-  const { data: { session } } = await supa.auth.getSession();
-  if (session) {
-    currentUser = session.user;
-    await loadUserProfile();
-    showApp();
-  }
+  h += '<div style="background:#FF6264;padding:10px 28px;display:flex;justify-content:space-between;align-items:center;"><div style="font-weight:900;color:white;">one TRIP</div><div style="color:rgba(255,255,255,.75);font-size:8px;">www.onetrip.com</div><div style="color:#FFC630;font-size:8px;font-weight:700;">y no paras de viajar.</div></div></div>';
+  var nb = '<div style="position:fixed;top:0;left:0;right:0;background:#1a1a2e;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;z-index:999;"><button onclick="location.reload()" style="background:none;border:1px solid #555;color:white;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Volver</button><span style="color:white;font-size:10px;font-weight:700;">Compartir desde Safari</span></div>';
+  document.body.innerHTML = nb + '<div style="padding-top:50px;">' + h + '</div>';
+  window.scrollTo(0, 0);
 }
-
-async function loadUserProfile() {
-  const { data } = await supa.from('vendedores').select('nombre').eq('id', currentUser.id).single();
-  const nombre = data?.nombre || currentUser.email.split('@')[0];
-  document.getElementById('user-name-display').textContent = nombre;
-}
-
-function showApp() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('user-bar').style.display = 'flex';
-}
-
-function toggleMode() {
-  isRegisterMode = !isRegisterMode;
-  document.getElementById('login-sub').textContent = isRegisterMode ? 'Creá tu cuenta' : 'Ingresá con tu cuenta';
-  document.getElementById('login-btn').textContent = isRegisterMode ? 'Registrarse' : 'Ingresar';
-  document.getElementById('login-toggle').textContent = isRegisterMode ? '¿Ya tenés cuenta? Ingresá' : '¿No tenés cuenta? Registrate';
-  document.getElementById('reg-nombre').style.display = isRegisterMode ? 'block' : 'none';
-  document.getElementById('login-err').style.display = 'none';
-}
-
-async function doAuth() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass  = document.getElementById('login-pass').value;
-  const btn   = document.getElementById('login-btn');
-  const err   = document.getElementById('login-err');
-  
-  if (!email || !pass) { err.textContent = 'Completá email y contraseña.'; err.style.display='block'; return; }
-  
-  if (typeof supabase === 'undefined' || !supa) {
-    err.textContent = 'Error de conexión. Recargá la página.';
-    err.style.display='block';
-    return;
-  }
-  
-  btn.disabled = true; btn.textContent = 'Cargando...';
-  err.style.display = 'none';
-
-  if (isRegisterMode) {
-    const nombre = document.getElementById('reg-nombre').value.trim();
-    if (!nombre) { err.textContent = 'Ingresá tu nombre.'; err.style.display='block'; btn.disabled=false; btn.textContent='Registrarse'; return; }
-    const { data, error } = await supa.auth.signUp({ email, password: pass });
-    if (error) { err.textContent = error.message; err.style.display='block'; btn.disabled=false; btn.textContent='Registrarse'; return; }
-    // Save nombre in vendedores table
-    await supa.from('vendedores').upsert({ id: data.user.id, email, nombre });
-    currentUser = data.user;
-    document.getElementById('user-name-display').textContent = nombre;
-    showApp();
-  } else {
-    const { data, error } = await supa.auth.signInWithPassword({ email, password: pass });
-    if (error) { err.textContent = 'Email o contraseña incorrectos.'; err.style.display='block'; btn.disabled=false; btn.textContent='Ingresar'; return; }
-    currentUser = data.user;
-    await loadUserProfile();
-    showApp();
-  }
-  btn.disabled=false;
-}
-
-async function logout() {
-  await supa.auth.signOut();
-  currentUser = null;
-  document.getElementById('login-screen').style.display='flex';
-  document.getElementById('user-bar').style.display='none';
-  document.getElementById('results').className='results';
-}
-
 async function guardarCotizacion(salida, opciones, paseAdult, totalPax, nombreCliente) {
   if (!currentUser) return;
   const rows = opciones.map(opt => ({
