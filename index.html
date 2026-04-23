@@ -820,13 +820,10 @@ function generarPDF() {
       .join('<br>');
 
   const filas = opciones.map(opt => {
-    return opt.paxPrecios.map((pp, i) => `
-    <tr>
-      ${i===0 ? `<td style="padding:10px 16px;border-bottom:1px solid #eee;font-weight:700;font-size:12px;" rowspan="${opt.paxPrecios.length}">${opt.nombre}</td>` : ''}
-      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-size:11px;color:#666;">${pp.label.trim()} · ${fmt(pp.paquete)}</td>
-      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-size:11px;color:#666;">${pp.pase > 0 ? fmt(pp.pase) : '—'}</td>
-      <td style="padding:10px 16px;border-bottom:1px solid #eee;font-weight:900;font-size:14px;color:#FF6264;text-align:right;">${fmt(pp.total)}</td>
-    </tr>`).join('');
+    return opt.paxPrecios.map((pp, i) => {
+      const firstCell = i===0 ? '<td style="padding:10px 16px;border-bottom:1px solid #eee;font-weight:700;font-size:12px;" rowspan="'+opt.paxPrecios.length+'">'+opt.nombre+'</td>' : '';
+      return `<tr>${firstCell}<td style="padding:10px 16px;border-bottom:1px solid #eee;font-size:11px;color:#666;">${pp.label.trim()} · ${fmt(pp.paquete)}</td><td style="padding:10px 16px;border-bottom:1px solid #eee;font-size:11px;color:#666;">${pp.pase > 0 ? fmt(pp.pase) : '—'}</td><td style="padding:10px 16px;border-bottom:1px solid #eee;font-weight:900;font-size:14px;color:#FF6264;text-align:right;">${fmt(pp.total)}</td></tr>`;
+    }).join('');
   }).join('');
 
   const html = `
