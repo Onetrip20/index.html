@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Trip — Cotizador Las Leñas 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --coral:#FF6264; --yellow:#FFC630; --violet:#7468D9;
+  --dark:#1a1a2e; --gray:#f2f3f7; --white:#fff; --line:#e2e4ec;
+  --green:#16a34a; --green-bg:#f0fdf4;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+body{font-family:'Montserrat',sans-serif;background:#f2f3f7;color:#1a1a2e;min-height:100vh;}
+
+.hdr{background:#FF6264;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;}
+.hdr::before{content:’’;position:absolute;right:-20px;top:-20px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.10);}
+.logo{display:flex;flex-direction:column;line-height:1;z-index:1;}
+.logo-smile{width:11px;height:5px;border:2px solid white;border-top:none;border-radius:0 0 7px 7px;margin-bottom:1px;}
+.logo-one{font-size:17px;font-weight:900;color:white;}
+.logo-trip{font-size:17px;font-weight:900;color:white;letter-spacing:2px;margin-top:-2px;}
+.hdr-right{text-align:right;color:white;z-index:1;}
+.hdr-right .dest{font-size:18px;font-weight:900;}
+.hdr-right .dest span{color:#FFC630;}
+.hdr-right .sub{font-size:7px;letter-spacing:3px;text-transform:uppercase;opacity:.75;}
+
+.main{max-width:820px;margin:0 auto;padding:22px 16px 60px;}
+
+.card{background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,0.07);padding:22px;margin-bottom:18px;}
+.card-title{font-size:10px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;color:#bbb;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.card-title::after{content:’’;flex:1;height:1px;background:#e2e4ec;}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.fgroup{display:flex;flex-direction:column;gap:5px;}
+label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#999;}
+.sel{position:relative;}
+.sel::after{content:‘▾’;position:absolute;right:11px;top:50%;transform:translateY(-50%);color:#bbb;pointer-events:none;font-size:11px;}
+select{width:100%;border:1.5px solid #e2e4ec;border-radius:10px;padding:10px 30px 10px 12px;font-family:‘Montserrat’,sans-serif;font-size:12px;font-weight:600;color:#1a1a2e;background:white;-webkit-appearance:none;appearance:none;cursor:pointer;transition:border-color .2s;}
+select:focus{outline:none;border-color:#FF6264;}
+select:disabled{opacity:.35;cursor:not-allowed;}
+
+.pax-box{border:1.5px solid #e2e4ec;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;}
+.pax-info{flex:1;}
+.pax-name{font-size:12px;font-weight:700;}
+.pax-hint{font-size:9px;color:#aaa;}
+.counter{display:flex;align-items:center;gap:8px;}
+.cbtn{width:28px;height:28px;border-radius:50%;border:2px solid #FF6264;background:white;color:#FF6264;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;line-height:1;}
+.cbtn:hover{background:#FF6264;color:white;}
+.cbtn:disabled{opacity:.3;cursor:not-allowed;border-color:#ccc;color:#ccc;}
+.cbtn:disabled:hover{background:white;color:#ccc;}
+.cval{font-size:16px;font-weight:900;min-width:20px;text-align:center;}
+
+.btn-quote{width:100%;background:#FF6264;color:white;border:none;border-radius:12px;padding:14px;font-family:‘Montserrat’,sans-serif;font-size:13px;font-weight:900;letter-spacing:1px;cursor:pointer;transition:all .2s;margin-top:4px;}
+.btn-quote:hover{background:#ff4547;transform:translateY(-1px);box-shadow:0 4px 16px rgba(255,98,100,.35);}
+
+.results{display:none;}
+.results.show{display:block;}
+.results-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:10px;}
+.results-title{font-size:13px;font-weight:900;}
+.results-sub{font-size:10px;color:#999;margin-top:3px;line-height:1.5;}
+.badge{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.badge-coral{background:#fff0f0;color:#FF6264;}
+.badge-baja{background:#e0f2fe;color:#0369a1;}
+.badge-media{background:#fef9c3;color:#854d0e;}
+.badge-alta{background:#fee2e2;color:#b91c1c;}
+.badge-especial{background:#ede9fe;color:#5b21b6;}
+
+.options-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+.opt-card{border:2px solid #e2e4ec;border-radius:14px;padding:16px 18px;transition:border-color .2s;position:relative;overflow:hidden;}
+.opt-card.best{border-color:#FF6264;background:#fff8f8;}
+.opt-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:10px;}
+.opt-name{font-size:13px;font-weight:900;line-height:1.3;}
+.opt-type{font-size:9px;color:#aaa;margin-top:3px;font-weight:500;}
+.opt-price{text-align:right;flex-shrink:0;}
+.opt-price .price{font-size:22px;font-weight:900;color:#FF6264;line-height:1;}
+.opt-price .price-label{font-size:8px;color:#aaa;margin-top:2px;}
+.opt-desglose{display:flex;flex-wrap:wrap;gap:8px;border-top:1px solid #e2e4ec;padding-top:10px;}
+.opt-desglose-item{flex:1;background:#f2f3f7;border-radius:8px;padding:8px 10px;}
+.opt-desglose-item .dl{font-size:8px;color:#aaa;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.opt-desglose-item .dv{font-size:12px;font-weight:800;color:#1a1a2e;}
+
+.info-box{background:#fffbea;border:1.5px solid #ffe58f;border-radius:10px;padding:10px 14px;font-size:10px;color:#856404;display:flex;gap:8px;align-items:flex-start;margin-top:14px;line-height:1.6;}
+
+.no-result{text-align:center;padding:32px 20px;color:#aaa;}
+.no-result .icon{font-size:36px;margin-bottom:10px;}
+.no-result p{font-size:12px;line-height:1.6;}
+
+.btn-pdf{width:100%;background:#1a1a2e;color:white;border:none;border-radius:12px;padding:13px;font-family:‘Montserrat’,sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s;margin-top:12px;}
+.btn-pdf:hover{background:#2d2f4a;transform:translateY(-1px);}
+
+/* LOGIN */
+.login-screen{position:fixed;inset:0;background:#FF6264;display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;}
+.login-box{background:white;border-radius:20px;padding:32px 28px;width:100%;max-width:380px;box-shadow:0 8px 40px rgba(0,0,0,0.2);}
+.login-logo{display:flex;flex-direction:column;align-items:center;margin-bottom:24px;}
+.login-logo .smile{width:16px;height:7px;border:2.5px solid #FF6264;border-top:none;border-radius:0 0 8px 8px;margin-bottom:2px;}
+.login-logo .one{font-size:28px;font-weight:900;color:#FF6264;}
+.login-logo .trip{font-size:28px;font-weight:900;color:#FF6264;letter-spacing:3px;margin-top:-3px;}
+.login-title{font-size:13px;font-weight:900;text-align:center;margin-bottom:4px;}
+.login-sub{font-size:10px;color:#aaa;text-align:center;margin-bottom:22px;}
+.login-input{width:100%;border:1.5px solid #e2e4ec;border-radius:10px;padding:11px 14px;font-family:‘Montserrat’,sans-serif;font-size:13px;color:#1a1a2e;margin-bottom:10px;}
+.login-input:focus{outline:none;border-color:#FF6264;}
+.login-btn{width:100%;background:#FF6264;color:white;border:none;border-radius:10px;padding:13px;font-family:‘Montserrat’,sans-serif;font-size:13px;font-weight:900;cursor:pointer;margin-top:4px;}
+.login-btn:disabled{opacity:.5;cursor:not-allowed;}
+.login-err{font-size:10px;color:#e74c3c;text-align:center;margin-top:8px;display:none;}
+.login-toggle{font-size:10px;color:#FF6264;text-align:center;margin-top:14px;cursor:pointer;font-weight:600;}
+/* USER BAR */
+.user-bar{background:#1a1a2e;padding:8px 24px;display:flex;align-items:center;justify-content:space-between;}
+.user-bar .uname{font-size:10px;color:#aaa;font-weight:600;}
+.user-bar .uname strong{color:white;}
+.user-bar-btns{display:flex;gap:8px;}
+.btn-hist{background:transparent;border:1px solid #444;color:#aaa;border-radius:8px;padding:5px 12px;font-family:‘Montserrat’,sans-serif;font-size:9px;font-weight:700;cursor:pointer;letter-spacing:.5px;}
+.btn-hist:hover{border-color:#aaa;color:white;}
+.btn-logout{background:transparent;border:1px solid #666;color:#aaa;border-radius:8px;padding:5px 12px;font-family:‘Montserrat’,sans-serif;font-size:9px;font-weight:700;cursor:pointer;}
+.btn-logout:hover{border-color:#FF6264;color:#FF6264;}
+/* HISTORIAL */
+.hist-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:flex;align-items:flex-end;}
+.hist-panel{background:white;border-radius:20px 20px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:20px;}
+.hist-title{font-size:13px;font-weight:900;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+.hist-close{background:none;border:none;font-size:18px;cursor:pointer;color:#aaa;}
+.hist-item{border:1px solid #e2e4ec;border-radius:10px;padding:12px 14px;margin-bottom:8px;}
+.hist-item-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.hist-cliente{font-size:12px;font-weight:900;}
+.hist-fecha-cotiz{font-size:9px;color:#aaa;margin-top:2px;}
+.hist-precio{font-size:14px;font-weight:900;color:#FF6264;}
+.hist-detalles{font-size:10px;color:#666;margin-top:6px;}
+.hist-empty{text-align:center;padding:32px;color:#aaa;font-size:12px;}
+
+@media print{
+body *{visibility:hidden;}
+#pdf-print,#pdf-print *{visibility:visible;}
+#pdf-print{position:fixed;top:0;left:0;width:100%;z-index:9999;}
+}
+.grid2,.grid3{grid-template-columns:1fr;}
+.opt-breakdown{grid-template-columns:1fr 1fr;}
+.hdr-right .dest{font-size:15px;}
+.opt-price .price{font-size:18px;}
+}
+</style>
+
+</head>
+<body>
+
+<div id="login-screen" class="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div style="font-size:28px;font-weight:900;color:#FF6264;">Ône<br>TRIP</div>
+    </div>
+    <div class="login-title">Cotizador Las Leñas 2026</div>
+    <div class="login-sub" id="login-sub">Ingresá con tu cuenta</div>
+    <input class="login-input" type="email" id="login-email" placeholder="Tu email" autocomplete="email"/>
+    <input class="login-input" type="password" id="login-pass" placeholder="Contraseña" autocomplete="current-password"/>
+    <input class="login-input" type="text" id="reg-nombre" placeholder="Tu nombre completo" style="display:none;" autocomplete="name"/>
+    <button class="login-btn" id="login-btn" onclick="doAuth()">Ingresar</button>
+    <div class="login-err" id="login-err"></div>
+    <div class="login-toggle" id="login-toggle" onclick="toggleMode()">¿No tenés cuenta? Registrate</div>
+  </div>
+</div>
+
+<div id="user-bar" class="user-bar" style="display:none;">
+  <div class="uname">Hola, <strong id="user-name-display"></strong></div>
+  <div class="user-bar-btns">
+    <button class="btn-hist" onclick="verHistorial()">📋 Mis cotizaciones</button>
+    <button class="btn-logout" onclick="logout()">Salir</button>
+  </div>
+</div>
+
+<div id="hist-overlay" class="hist-overlay" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="hist-panel">
+    <div class="hist-title">
+      Mis cotizaciones
+      <button class="hist-close" onclick="document.getElementById('hist-overlay').style.display='none'">✕</button>
+    </div>
+    <div id="hist-list"></div>
+  </div>
+</div>
+
+<div class="hdr">
+  <div class="logo">
+    <div style="font-size:18px;font-weight:900;color:white;">Ône<br>TRIP</div>
+  </div>
+  <div class="hdr-right">
+    <div class="sub">Cotizador · Temporada 2026</div>
+    <div class="dest">Las <span>Leñas</span></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="card">
+
+```
+<div class="card-title">Cliente</div>
+<div class="fgroup" style="margin-bottom:18px;">
+  <label>Nombre del cliente</label>
+  <input type="text" id="nombre-cliente" placeholder="Nombre y apellido del cliente"
+    style="border:1.5px solid #e2e4ec;border-radius:10px;padding:10px 14px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;color:#1a1a2e;width:100%;"
+    onfocus="this.style.borderColor='#FF6264'" onblur="this.style.borderColor='#e2e4ec'"/>
+</div>
+
+<div class="card-title">Fecha de salida</div>
+<div class="grid2" style="margin-bottom:18px;">
+  <div class="fgroup">
+    <label>Salida</label>
+    <div class="sel">
+      <select id="sel-fecha">
+        <option value="">— Elegí una fecha —</option>
+      </select>
+    </div>
+  </div>
+  <div class="fgroup">
+    <label>Tipo de semana</label>
+    <div class="sel">
+      <select id="sel-tipo" disabled>
+        <option value="">— Elegí fecha primero —</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="card-title">Pasajeros</div>
+<div class="grid3" style="margin-bottom:18px;">
+  <div class="pax-box">
+    <div class="pax-info">
+      <div class="pax-name">Adultos</div>
+      <div class="pax-hint">+12 años</div>
+    </div>
+    <div class="counter">
+      <button class="cbtn" onclick="changePax('adult',-1)">−</button>
+      <span class="cval" id="val-adult">2</span>
+      <button class="cbtn" onclick="changePax('adult',1)">+</button>
+    </div>
+  </div>
+  <div class="pax-box">
+    <div class="pax-info">
+      <div class="pax-name">Menores</div>
+      <div class="pax-hint">3 a 11 años</div>
+    </div>
+    <div class="counter">
+      <button class="cbtn" onclick="changePax('minor',-1)">−</button>
+      <span class="cval" id="val-minor">0</span>
+      <button class="cbtn" onclick="changePax('minor',1)">+</button>
+    </div>
+  </div>
+  <div class="pax-box" style="background:#f2f3f7;">
+    <div class="pax-info">
+      <div class="pax-name">Total</div>
+      <div class="pax-hint" id="pax-hint">2 personas</div>
+    </div>
+    <span class="cval" id="val-total" style="color:#FF6264;font-size:20px;">2</span>
+  </div>
+</div>
+
+<div class="card-title">Tipo de pase</div>
+<div id="pases-container" style="margin-bottom:4px;display:flex;flex-direction:column;gap:8px;"></div>
+
+<button class="btn-quote" onclick="cotizar()">🔍 &nbsp; Cotizar</button>
+```
+
+  </div>
+
+  <div class="results" id="results">
+    <div class="results-header">
+      <div>
+        <div class="results-title" id="res-title"></div>
+        <div class="results-sub" id="res-sub"></div>
+      </div>
+      <span class="badge" id="res-badge"></span>
+    </div>
+    <div class="options-grid" id="options-grid"></div>
+    <div class="info-box">
+      ⚠️ <span>Precios <strong>por persona</strong> en pesos argentinos con IVA incluido. Incluye alojamiento, bus, transfer, seguro, coordinación y pase de ski según categoría seleccionada.</span>
+    </div>
+    <button class="btn-pdf" onclick="generarPDF()" id="btn-pdf">📄 &nbsp; Descargar cotización para el cliente</button>
+  </div>
+
+  <!-- PDF oculto para imprimir -->
+
+  <div id="pdf-content" style="display:none;"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// SUPABASE — Init inmediato
+// ══════════════════════════════════════════════════════
+const SUPA_URL = 'https://tioigvourdjssyxrcnvt.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpb2lndm91cmRqc3N5eHJjbnZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTA0MzMsImV4cCI6MjA5MjM4NjQzM30.wWI5tXbHhlm6f8XbEyqjNUajl-XiKX-bshzsdfg6ncI';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+let currentUser = null;
+let isRegisterMode = false;
+let ultimaCotizacion = null;
+
+// ══════════════════════════════════════════════════════
+// DATOS: TECA — Venta al público por persona
+// Fuente: AnAlisis_para_ia.xlsx → VENTA AL PUBLICO (row 25)
+// Clave interna = fecha del Excel (sábado/martes)
+// ══════════════════════════════════════════════════════
+const TECA_MINI = {
+  '27/06':{'4e':999000,'4d':1064250,'5e':1016400,'5d':1051200,'6b':1057000,'7b':1036286,'8b':1031625},
+  '04/07':{'4e':1270000,'4d':1335250,'5e':1256950,'5d':1309150,'6b':1306250,'7b':1266893,'8b':1237375},
+  '11/07':{'4e':1350000,'4d':1415250,'5e':1336950,'5d':1389150,'6b':1386250,'7b':1346893,'8b':1317375},
+  '18/07':{'4e':1350000,'4d':1415250,'5e':1336950,'5d':1389150,'6b':1386250,'7b':1346893,'8b':1317375},
+  '25/07':{'4e':1350000,'4d':1415250,'5e':1336950,'5d':1389150,'6b':1386250,'7b':1346893,'8b':1317375},
+  '01/08':{'4e':990000,'4d':1055250,'5e':976950,'5d':1029150,'6b':1026250,'7b':986893,'8b':957375},
+  '08/08':{'4e':1270000,'4d':1335250,'5e':1256950,'5d':1309150,'6b':1306250,'7b':1266893,'8b':1237375},
+  '15/08':{'4e':1350000,'4d':1415250,'5e':1336950,'5d':1389150,'6b':1386250,'7b':1346893,'8b':1317375},
+  '22/08':{'4e':1270000,'4d':1335250,'5e':1256950,'5d':1309150,'6b':1306250,'7b':1266893,'8b':1237375},
+  '29/08':{'4e':1150000,'4d':1215250,'5e':1136950,'5d':1189150,'6b':1186250,'7b':1146893,'8b':1117375},
+  '04/09':{'4e':1150000,'4d':1215000,'5e':1150000,'5d':1150000,'6b':1150000,'7b':1150000,'8b':1150000},
+};
+const TECA_EXTRA = {
+  '30/06':{'4e':1050000,'4d':1093500,'5e':1061600,'5d':1084800,'6b':1088667,'7b':1074857,'8b':1071750},
+  '07/07':{'4e':1260000,'4d':1303500,'5e':1251300,'5d':1286100,'6b':1284167,'7b':1257929,'8b':1238250},
+  '14/07':{'4e':1350000,'4d':1393500,'5e':1341300,'5d':1376100,'6b':1374167,'7b':1347929,'8b':1328250},
+  '21/07':{'4e':1350000,'4d':1393500,'5e':1341300,'5d':1376100,'6b':1374167,'7b':1347929,'8b':1328250},
+  '28/07':{'4e':1350000,'4d':1393500,'5e':1341300,'5d':1376100,'6b':1374167,'7b':1347929,'8b':1328250},
+  '04/08':{'4e':1360000,'4d':1403500,'5e':1351300,'5d':1386100,'6b':1384167,'7b':1357929,'8b':1338250},
+  '11/08':{'4e':1090000,'4d':1133500,'5e':1081300,'5d':1116100,'6b':1114167,'7b':1087929,'8b':1068250},
+  '18/08':{'4e':1090000,'4d':1155250,'5e':1076950,'5d':1129150,'6b':1126250,'7b':1086893,'8b':1057375},
+  '25/08':{'4e':1090000,'4d':1133500,'5e':1081300,'5d':1116100,'6b':1114167,'7b':1087929,'8b':1068250},
+  '01/09':{'4e':1120000,'4d':1163500,'5e':1111300,'5d':1146100,'6b':1144167,'7b':1117929,'8b':1098250},
+  '08/09':{'4e':1120000,'4d':1163500,'5e':1131600,'5d':1154800,'6b':1158667,'7b':1144857,'8b':1141750},
+};
+
+// PASES TECA por fecha (precio por persona)
+const PASES = {
+  'mini_27/06':{comun:416200,univers:404000,menor:430900},
+  'mini_04/07':{comun:538600,univers:404000,menor:430900},
+  'mini_11/07':{comun:612000,univers:459000,menor:489600},
+  'mini_18/07':{comun:612000,univers:459000,menor:489600},
+  'mini_25/07':{comun:612000,univers:459000,menor:489600},
+  'mini_01/08':{comun:538600,univers:404000,menor:430900},
+  'mini_08/08':{comun:538600,univers:475200,menor:506900},
+  'mini_15/08':{comun:612000,univers:459000,menor:489600},
+  'mini_22/08':{comun:538600,univers:475200,menor:506900},
+  'mini_29/08':{comun:416200,univers:312200,menor:333000},
+  'mini_04/09':{comun:416200,univers:312200,menor:333000},
+  'extra_30/06':{comun:489600,univers:475200,menor:506900},
+  'extra_07/07':{comun:633600,univers:475200,menor:506900},
+  'extra_14/07':{comun:720000,univers:540000,menor:576000},
+  'extra_21/07':{comun:720000,univers:540000,menor:576000},
+  'extra_28/07':{comun:633600,univers:475200,menor:506900},
+  'extra_04/08':{comun:633600,univers:475200,menor:506900},
+  'extra_11/08':{comun:633600,univers:475200,menor:506900},
+  'extra_18/08':{comun:633600,univers:475200,menor:506900},
+  'extra_25/08':{comun:633600,univers:475200,menor:506900},
+  'extra_01/09':{comun:489600,univers:367200,menor:391700},
+  'extra_08/09':{comun:489600,univers:367200,menor:391700},
+};
+
+// ══════════════════════════════════════════════════════
+// DELPHOS & GÉMINIS — precio publicado (se aplica ×0.85)
+// Miniweek = 3 noches (viernes), Extraweek = 4 noches (lunes)
+// Períodos: A=baja, B=media-baja, C=media-alta, D=vac.inv.
+// ══════════════════════════════════════════════════════
+
+// Costos fijos (sin cama) por fecha — bus + transfer + seguro + coord + utilidad + comisión
+const COSTOS_FIJOS = {
+  // Miniweek
+  'mini_27/06': 516110, 'mini_04/07': 545068, 'mini_11/07': 548738,
+  'mini_18/07': 548738, 'mini_25/07': 548738, 'mini_01/08': 545068,
+  'mini_08/08': 545068, 'mini_15/08': 548738, 'mini_22/08': 545068,
+  'mini_29/08': 538948, 'mini_04/09': 516110,
+  // Extraweek
+  'extra_30/06': 513380, 'extra_07/07': 535775, 'extra_14/07': 540125,
+  'extra_21/07': 540125, 'extra_28/07': 535805, 'extra_04/08': 552118,
+  'extra_11/08': 535805, 'extra_18/08': 535805, 'extra_25/08': 535805,
+  'extra_01/09': 528605, 'extra_08/09': 513380,
+};
+const DG_PERIODO = {
+  // Período A (baja): salidas 13/6, 20/6, 5/9, 12/9, 19/9
+  '13/06':'A','20/06':'A','05/09':'A','12/09':'A','19/09':'A',
+  // Período B (media-baja): 27/6, 22/8, 29/8
+  '27/06':'B','22/08':'B','29/08':'B',
+  // Período C (media-alta): 4/7, 11/7, 2/8, 8/8, 15/8
+  '04/07':'C','11/07':'C','02/08':'C','08/08':'C','15/08':'C',
+  // Período D (vacaciones invierno): 18/7, 25/7
+  '18/07':'D','25/07':'D',
+  // Extra solo (lunes):
+  '29/06':'A','06/07':'C','13/07':'C','20/07':'C',
+  '27/07':'B','03/08':'C','10/08':'C','17/08':'C',
+  '24/08':'B','31/08':'A','07/09':'A',
+  // Mini solo (viernes) — mismo mapeo que el interno
+  '26/06':'B','03/07':'C','10/07':'C','17/07':'D','24/07':'D',
+  '31/07':'B','07/08':'C','14/08':'C','21/08':'B','28/08':'A','03/09':'A',
+};
+
+// Precios publicados Delphos — por período y cantidad de noches (3=mini, 4=extra)
+const DELPHOS = {
+  A:{
+    n3:{'2p':{my:450000,mn:360000},'3p':{my:370000,mn:295000},'4p_st':{my:340000,mn:275000},'4p_2a':{my:395000,mn:315000},'5p':{my:340000,mn:275000},'6p':{my:340000,mn:275000}},
+    n4:{'2p':{my:600000,mn:480000},'3p':{my:495000,mn:395000},'4p_st':{my:450000,mn:360000},'4p_2a':{my:520000,mn:415000},'5p':{my:450000,mn:360000},'6p':{my:450000,mn:360000}},
+  },
+  B:{
+    n3:{'2p':{my:495000,mn:395000},'3p':{my:410000,mn:330000},'4p_st':{my:375000,mn:300000},'4p_2a':{my:465000,mn:345000},'5p':{my:485000,mn:390000},'6p':{my:485000,mn:390000}},
+    n4:{'2p':{my:660000,mn:530000},'3p':{my:540000,mn:430000},'4p_st':{my:495000,mn:395000},'4p_2a':{my:570000,mn:455000},'5p':{my:495000,mn:395000},'6p':{my:495000,mn:395000}},
+  },
+  C:{
+    n3:{'2p':{my:525000,mn:420000},'3p':{my:470000,mn:375000},'4p_st':{my:420000,mn:335000},'4p_2a':{my:465000,mn:375000},'5p':{my:420000,mn:335000},'6p':{my:420000,mn:335000}},
+    n4:{'2p':{my:690000,mn:550000},'3p':{my:630000,mn:505000},'4p_st':{my:565000,mn:450000},'4p_2a':{my:615000,mn:495000},'5p':{my:565000,mn:450000},'6p':{my:565000,mn:450000}},
+  },
+  D:{
+    n3:{'2p':{my:525000,mn:420000},'3p':{my:470000,mn:375000},'4p_st':{my:420000,mn:335000},'4p_2a':{my:465000,mn:375000},'5p':{my:420000,mn:335000},'6p':{my:420000,mn:335000}},
+    n4:{'2p':{my:690000,mn:550000},'3p':{my:630000,mn:505000},'4p_st':{my:565000,mn:450000},'4p_2a':{my:615000,mn:495000},'5p':{my:565000,mn:450000},'6p':{my:565000,mn:450000}},
+  },
+};
+
+const GEMINIS = {
+  A:{
+    n3:{'2p':{my:515000,mn:415000},'3p':{my:445000,mn:355000},'4p_ext':{my:450000,mn:355000},'4p_int':{my:400000,mn:320000},'5p':{my:395000,mn:315000},'6p':{my:390000,mn:310000}},
+    n4:{'2p':{my:690000,mn:550000},'3p':{my:635000,mn:510000},'4p_ext':{my:595000,mn:475000},'4p_int':{my:530000,mn:425000},'5p':{my:525000,mn:420000},'6p':{my:520000,mn:410000}},
+  },
+  B:{
+    n3:{'2p':{my:570000,mn:455000},'3p':{my:485000,mn:390000},'4p_ext':{my:495000,mn:395000},'4p_int':{my:440000,mn:350000},'5p':{my:435000,mn:345000},'6p':{my:420000,mn:335000}},
+    n4:{'2p':{my:762000,mn:610000},'3p':{my:650000,mn:520000},'4p_ext':{my:655000,mn:525000},'4p_int':{my:580000,mn:465000},'5p':{my:575000,mn:460000},'6p':{my:570000,mn:455000}},
+  },
+  C:{
+    n3:{'2p':{my:595000,mn:475000},'3p':{my:520000,mn:415000},'4p_ext':{my:525000,mn:420000},'4p_int':{my:485000,mn:390000},'5p':{my:480000,mn:385000},'6p':{my:475000,mn:375000}},
+    n4:{'2p':{my:790000,mn:635000},'3p':{my:690000,mn:552000},'4p_ext':{my:695000,mn:560000},'4p_int':{my:640000,mn:510000},'5p':{my:630000,mn:505000},'6p':{my:620000,mn:495000}},
+  },
+  D:{
+    n3:{'2p':{my:595000,mn:475000},'3p':{my:520000,mn:415000},'4p_ext':{my:525000,mn:420000},'4p_int':{my:485000,mn:390000},'5p':{my:480000,mn:385000},'6p':{my:475000,mn:375000}},
+    n4:{'2p':{my:790000,mn:635000},'3p':{my:690000,mn:552000},'4p_ext':{my:695000,mn:560000},'4p_int':{my:640000,mn:510000},'5p':{my:630000,mn:505000},'6p':{my:620000,mn:495000}},
+  },
+};
+
+// ══════════════════════════════════════════════════════
+// FECHAS DE SALIDA REALES
+// Mini = viernes, Extra = lunes
+// ══════════════════════════════════════════════════════
+const SALIDAS = [
+  // viernes (miniweek)
+  {salida:'26/06',dia:'Viernes',tipo:'mini', tk:'27/06',dgk:'26/06',temp:'Baja'},
+  {salida:'03/07',dia:'Viernes',tipo:'mini', tk:'04/07',dgk:'03/07',temp:'Media'},
+  {salida:'10/07',dia:'Viernes',tipo:'mini', tk:'11/07',dgk:'10/07',temp:'Alta'},
+  {salida:'17/07',dia:'Viernes',tipo:'mini', tk:'18/07',dgk:'17/07',temp:'Alta · Vac. Invierno'},
+  {salida:'24/07',dia:'Viernes',tipo:'mini', tk:'25/07',dgk:'24/07',temp:'Alta · Vac. Invierno'},
+  {salida:'31/07',dia:'Viernes',tipo:'mini', tk:'01/08',dgk:'31/07',temp:'Media'},
+  {salida:'07/08',dia:'Viernes',tipo:'mini', tk:'08/08',dgk:'07/08',temp:'Media'},
+  {salida:'14/08',dia:'Viernes',tipo:'mini', tk:'15/08',dgk:'14/08',temp:'Alta'},
+  {salida:'21/08',dia:'Viernes',tipo:'mini', tk:'22/08',dgk:'21/08',temp:'Media'},
+  {salida:'28/08',dia:'Viernes',tipo:'mini', tk:'29/08',dgk:'28/08',temp:'Baja'},
+  {salida:'03/09',dia:'Viernes',tipo:'mini', tk:'04/09',dgk:'03/09',temp:'Baja'},
+  // lunes (extraweek)
+  {salida:'29/06',dia:'Lunes',  tipo:'extra',tk:'30/06',dgk:'29/06',temp:'Baja'},
+  {salida:'06/07',dia:'Lunes',  tipo:'extra',tk:'07/07',dgk:'06/07',temp:'Alta'},
+  {salida:'13/07',dia:'Lunes',  tipo:'extra',tk:'14/07',dgk:'13/07',temp:'Alta'},
+  {salida:'20/07',dia:'Lunes',  tipo:'extra',tk:'21/07',dgk:'20/07',temp:'Alta'},
+  {salida:'27/07',dia:'Lunes',  tipo:'extra',tk:'28/07',dgk:'27/07',temp:'Media'},
+  {salida:'03/08',dia:'Lunes',  tipo:'extra',tk:'04/08',dgk:'03/08',temp:'Media'},
+  {salida:'10/08',dia:'Lunes',  tipo:'extra',tk:'11/08',dgk:'10/08',temp:'Media'},
+  {salida:'17/08',dia:'Lunes',  tipo:'extra',tk:'18/08',dgk:'17/08',temp:'Especial'},
+  {salida:'24/08',dia:'Lunes',  tipo:'extra',tk:'25/08',dgk:'24/08',temp:'Media'},
+  {salida:'31/08',dia:'Lunes',  tipo:'extra',tk:'01/09',dgk:'31/08',temp:'Baja'},
+  {salida:'07/09',dia:'Lunes',  tipo:'extra',tk:'08/09',dgk:'07/09',temp:'Baja'},
+];
+
+// ══════════════════════════════════════════════════════
+// ESTADO
+// ══════════════════════════════════════════════════════
+const pax = {adult:2, minor:0};
+
+function changePax(tipo, delta) {
+  if (tipo==='adult') pax.adult = Math.max(1, pax.adult+delta);
+  else pax.minor = Math.max(0, pax.minor+delta);
+  const total = pax.adult+pax.minor;
+  document.getElementById('val-adult').textContent = pax.adult;
+  document.getElementById('val-minor').textContent = pax.minor;
+  document.getElementById('val-total').textContent = total;
+  document.getElementById('pax-hint').textContent = total+' persona'+(total>1?'s':'');
+  renderPaseSelectors();
+}
+
+function renderPaseSelectors() {
+  const container = document.getElementById('pases-container');
+  container.innerHTML = '';
+  for (let i = 0; i < pax.adult; i++) {
+    container.innerHTML += `
+      <div class="fgroup">
+        <label>Adulto ${pax.adult > 1 ? i+1 : ''}</label>
+        <div class="sel">
+          <select id="pase-adult-${i}">
+            <option value="comun">Pase Común</option>
+            <option value="univers">Pase Universitario</option>
+            <option value="menor_cat">Pase Menor (categoría)</option>
+            <option value="sin">Sin pase</option>
+          </select>
+        </div>
+      </div>`;
+  }
+  for (let i = 0; i < pax.minor; i++) {
+    container.innerHTML += `
+      <div class="fgroup">
+        <label>Menor ${pax.minor > 1 ? i+1 : ''}</label>
+        <div class="sel">
+          <select id="pase-minor-${i}">
+            <option value="menor">Pase Menor</option>
+            <option value="sin">Sin pase</option>
+          </select>
+        </div>
+      </div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+function init() {
+  const selFecha = document.getElementById('sel-fecha');
+  SALIDAS.forEach((s,i) => {
+    const o = document.createElement('option');
+    o.value = i;
+    const tipoLabel = s.tipo==='mini' ? 'Miniweek (3 noches)' : 'Extraweek (4 noches)';
+    o.textContent = `${s.dia} ${s.salida}/2026  ·  ${tipoLabel}  ·  ${s.temp}`;
+    selFecha.appendChild(o);
+  });
+
+  selFecha.addEventListener('change', () => {
+    const selTipo = document.getElementById('sel-tipo');
+    selTipo.innerHTML = '';
+    const idx = selFecha.value;
+    if (idx==='') {
+      selTipo.disabled=true;
+      selTipo.innerHTML='<option>— Elegí fecha primero —</option>';
+      return;
+    }
+    const s = SALIDAS[+idx];
+    selTipo.disabled = false;
+
+    const tipoLabel = s.tipo==='mini'
+      ? 'Miniweek · 3 noches (sale viernes)'
+      : 'Extraweek · 4 noches (sale lunes)';
+
+    addOpt(selTipo, 'teca', `TECA · ${tipoLabel}`);
+    addOpt(selTipo, 'dormis', `Dormis · ${tipoLabel}`);
+
+    const periodo = DG_PERIODO[s.dgk];
+    if (periodo) {
+      const noches = s.tipo==='mini'?'3 noches':'4 noches';
+      addOpt(selTipo, 'delphos', `Delphos · ${noches}`);
+      addOpt(selTipo, 'geminis', `Géminis · ${noches}`);
+      addOpt(selTipo, 'todos', `Ver todas las opciones comparadas`);
+    }
+  });
+}
+
+function addOpt(sel, val, label) {
+  const o = document.createElement('option');
+  o.value=val; o.textContent=label; sel.appendChild(o);
+}
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+const fmt = n => '$'+(Math.ceil(n/10000)*10000).toLocaleString('es-AR');
+
+function getTecaDeptos(total) {
+  if (total<=4) return [{k:'4e',l:'Studio 1 Baño (base 4)'},{k:'4d',l:'Dúplex 1 Baño (base 4)'}];
+  if (total===5) return [{k:'5e',l:'Studio 1 Baño (base 5)'},{k:'5d',l:'Dúplex 1 Baño (base 5)'}];
+  if (total===6) return [{k:'6b',l:'2 Amb. 2 Baños (base 6)'}];
+  if (total===7) return [{k:'7b',l:'2 Amb. 2 Baños (base 7)'}];
+  return [{k:'8b',l:'2 Amb. 2 Baños (base 8-9)'}];
+}
+
+function getDGKey(total, edif) {
+  if (edif==='delphos') {
+    if (total<=2) return {k:'2p',l:'Studio 1 Baño (base 2)'};
+    if (total===3) return {k:'3p',l:'Studio 1 Baño (base 3)'};
+    if (total===4) return [{k:'4p_st',l:'Studio 1 Baño (base 4)'},{k:'4p_2a',l:'2 Amb. 1 Baño (base 4)'}];
+    if (total===5) return {k:'5p',l:'2 Amb. 1 Baño (base 5)'};
+    return {k:'6p',l:'2 Amb. 1 Baño (base 6)'};
+  } else {
+    if (total<=2) return {k:'2p',l:'1 Dorm. 1 Baño (base 2)'};
+    if (total===3) return {k:'3p',l:'1 Dorm. 1 Baño (base 3)'};
+    if (total===4) return [{k:'4p_ext',l:'1 Dorm. 1 Baño EXT (base 4)'},{k:'4p_int',l:'1 Dorm. 1 Baño INT (base 4)'}];
+    if (total===5) return {k:'5p',l:'2 Dorm. 2 Baños (base 5)'};
+    return {k:'6p',l:'2 Dorm. 2 Baños (base 6)'};
+  }
+}
+
+function getPases(tipo, tk, paseAdult, paseMinor) {
+  const key = tipo+'_'+tk;
+  const p = PASES[key];
+  if (!p) return 0;
+  // Retorna precio del pase por persona (adulto) — el precio ya es unitario
+  if (paseAdult==='sin') return 0;
+  return p[paseAdult] || p.comun || 0;
+}
+
+function getPasesDesglose(tipo, tk, paseAdult, paseMinor) {
+  // Para el desglose en la card: precio pase adulto por persona
+  return getPases(tipo, tk, paseAdult, paseMinor);
+}
+
+function paseLabel(k) {
+  return {comun:'Pase Común',univers:'Pase Universitario',menor_cat:'Pase Menor',sin:'Sin pase'}[k]||k;
+}
+
+function tempBadgeClass(temp) {
+  if (temp.includes('Baja')) return 'badge-baja';
+  if (temp.includes('Invierno') || temp.includes('Alta')) return 'badge-alta';
+  if (temp.includes('Especial')) return 'badge-especial';
+  return 'badge-media';
+}
+
+// ══════════════════════════════════════════════════════
+// COTIZAR
+// ══════════════════════════════════════════════════════
+function cotizar() {
+  const idx = document.getElementById('sel-fecha').value;
+  const tipoSel = document.getElementById('sel-tipo').value;
+  const total = pax.adult + pax.minor;
+
+  if (idx===''||!tipoSel) { alert('Seleccioná fecha y tipo de semana.'); return; }
+
+  const s = SALIDAS[+idx];
+  const data = s.tipo==='mini' ? TECA_MINI : TECA_EXTRA;
+  const noches = s.tipo==='mini' ? 'n3' : 'n4';
+  const periodo = DG_PERIODO[s.dgk];
+  const deptos = getTecaDeptos(total);
+
+  // Leer pases individuales
+  const pasesAdultos = [];
+  for (let i = 0; i < pax.adult; i++) {
+    pasesAdultos.push(document.getElementById(`pase-adult-${i}`)?.value || 'comun');
+  }
+  const pasesMinores = [];
+  for (let i = 0; i < pax.minor; i++) {
+    pasesMinores.push(document.getElementById(`pase-minor-${i}`)?.value || 'menor');
+  }
+
+  const p = PASES[s.tipo+'_'+s.tk] || {};
+  // Precio de pase por cada pasajero individual
+  const preciosPasesAdultos = pasesAdultos.map(pa => pa==='sin' ? 0 : (p[pa]||p.comun||0));
+  const preciosPasesMinores = pasesMinores.map(pm => pm==='sin' ? 0 : (p.menor||0));
+
+  // Para el desglose principal usamos el pasajero 1 como referencia
+  const paseAdult = pasesAdultos[0] || 'comun';
+  const pases = preciosPasesAdultos[0] || 0;
+  const paseMN = preciosPasesMinores[0] || 0;
+  const paseMY = pases;
+
+  let opciones = [];
+
+  const paseLabels = {comun:'', univers:' (Universitario)', menor_cat:' (Pase Menor)', sin:' (Sin pase)'};
+
+  // ── TECA (precio publicado ya incluye pases — desglosamos)
+  if (tipoSel==='teca' || tipoSel==='todos') {
+    deptos.forEach(({k,l}) => {
+      if (data[s.tk]?.[k]) {
+        const precioTotal = data[s.tk][k];
+        const paquete = precioTotal - (preciosPasesAdultos[0]||0);
+        const paxPrecios = [
+          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}${paseLabels[pasesAdultos[i]]||''}`, paquete, pase:pp, total: paquete+pp})),
+          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}${pasesMinores[i]==='sin'?' (Sin pase)':''}`, paquete, pase:pp, total: paquete+pp})),
+        ];
+        opciones.push({
+          nombre: 'TECA · '+l,
+          tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
+          paxPrecios, tag:'teca',
+        });
+      }
+    });
+  }
+
+  // ── TECA DORMIS
+  if (tipoSel==='dormis' || tipoSel==='todos') {
+    deptos.forEach(({k,l}) => {
+      if (data[s.tk]?.[k]) {
+        const precioTotal = data[s.tk][k] - 70000;
+        const paquete = precioTotal - (preciosPasesAdultos[0]||0);
+        const paxPrecios = [
+          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}${paseLabels[pasesAdultos[i]]||''}`, paquete, pase:pp, total: paquete+pp})),
+          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}${pasesMinores[i]==='sin'?' (Sin pase)':''}`, paquete, pase:pp, total: paquete+pp})),
+        ];
+        opciones.push({
+          nombre: 'Dormis · '+l,
+          tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
+          paxPrecios, tag:'dormis',
+        });
+      }
+    });
+  }
+
+  // ── DELPHOS
+  if ((tipoSel==='delphos' || tipoSel==='todos') && periodo) {
+    const tabla = DELPHOS[periodo][noches];
+    const keys = getDGKey(total, 'delphos');
+    const arr = Array.isArray(keys) ? keys : [keys];
+    arr.forEach(({k,l}) => {
+      if (tabla[k]) {
+        const precioPubl = tabla[k];
+        const costoFijo = COSTOS_FIJOS[s.tipo+'_'+s.tk] || 0;
+        const alojMY = Math.ceil(precioPubl.my * 0.85) + costoFijo;
+        const alojMN = Math.ceil(precioPubl.mn * 0.85) + costoFijo;
+        const paxPrecios = [
+          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}${paseLabels[pasesAdultos[i]]||''}`, paquete:alojMY, pase:pp, total:alojMY+pp})),
+          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}${pasesMinores[i]==='sin'?' (Sin pase)':''}`, paquete:alojMN, pase:pp, total:alojMN+pp})),
+        ];
+        opciones.push({
+          nombre: 'Delphos · '+l,
+          tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
+          paxPrecios, tag:'dg',
+        });
+      }
+    });
+  }
+
+  // ── GÉMINIS
+  if ((tipoSel==='geminis' || tipoSel==='todos') && periodo) {
+    const tabla = GEMINIS[periodo][noches];
+    const keys = getDGKey(total, 'geminis');
+    const arr = Array.isArray(keys) ? keys : [keys];
+    arr.forEach(({k,l}) => {
+      if (tabla[k]) {
+        const precioPubl = tabla[k];
+        const costoFijo2 = COSTOS_FIJOS[s.tipo+'_'+s.tk] || 0;
+        const alojMY2 = Math.ceil(precioPubl.my * 0.85) + costoFijo2;
+        const alojMN2 = Math.ceil(precioPubl.mn * 0.85) + costoFijo2;
+        const paxPrecios = [
+          ...preciosPasesAdultos.map((pp,i) => ({label:`Adulto ${pax.adult>1?i+1:''}${paseLabels[pasesAdultos[i]]||''}`, paquete:alojMY2, pase:pp, total:alojMY2+pp})),
+          ...preciosPasesMinores.map((pp,i) => ({label:`Menor ${pax.minor>1?i+1:''}${pasesMinores[i]==='sin'?' (Sin pase)':''}`, paquete:alojMN2, pase:pp, total:alojMN2+pp})),
+        ];
+        opciones.push({
+          nombre: 'Géminis · '+l,
+          tipo: s.tipo==='mini'?'Miniweek · 3 noches':'Extraweek · 4 noches',
+          paxPrecios, tag:'dg',
+        });
+      }
+    });
+  }
+
+  // Render
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+
+  if (opciones.length===0) {
+    grid.innerHTML = `<div class="no-result"><div class="icon">🔍</div><p>Sin opciones para esta combinación.<br>Probá con otra fecha o cantidad de personas.</p></div>`;
+  } else {
+    opciones.sort((a,b) => a.precio-b.precio);
+    const minP = opciones[0].precio;
+    opciones.forEach(opt => {
+      const best = opt.precio===minP;
+      const card = document.createElement('div');
+      card.className = 'opt-card'+(best?' best':'');
+      const precioRef = opt.paxPrecios[0]?.total || 0;
+      card.innerHTML = `
+        <div class="opt-top">
+          <div>
+            <div class="opt-name">${opt.nombre}</div>
+            <div class="opt-type">${opt.tipo} · ${s.dia} ${s.salida}/2026 · ${s.temp}</div>
+          </div>
+          <div class="opt-price" style="text-align:right;flex-shrink:0;">
+            ${opt.paxPrecios.map(pp => `
+              <div style="display:flex;justify-content:flex-end;align-items:baseline;gap:6px;margin-bottom:2px;">
+                <span style="font-size:9px;color:#aaa;font-weight:700;text-transform:uppercase;">${pp.label.trim()}</span>
+                <span style="font-size:18px;font-weight:900;color:#FF6264;">${fmt(pp.total)}</span>
+              </div>
+            `).join('')}
+            <div style="font-size:8px;color:#aaa;text-align:right;margin-top:2px;">por persona · IVA incl.</div>
+          </div>
+        </div>
+        <div class="opt-desglose">
+          ${opt.paxPrecios.map(pp => `
+            <div class="opt-desglose-item" style="min-width:calc(50% - 4px);">
+              <div class="dl">${pp.label.trim()} · Paquete</div>
+              <div class="dv">${fmt(pp.paquete)}</div>
+            </div>
+            <div class="opt-desglose-item" style="min-width:calc(50% - 4px);">
+              <div class="dl">${pp.label.trim()} · Pase</div>
+              <div class="dv">${pp.pase > 0 ? fmt(pp.pase) : 'Sin pase'}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  const results = document.getElementById('results');
+  const badge = document.getElementById('res-badge');
+  badge.textContent = s.temp;
+  badge.className = 'badge '+tempBadgeClass(s.temp);
+  document.getElementById('res-title').textContent = opciones.length+' opción'+(opciones.length!==1?'es':'')+' disponible'+(opciones.length!==1?'s':'');
+  document.getElementById('res-sub').textContent =
+    `${s.dia} ${s.salida}/2026  ·  ${s.tipo==='mini'?'Miniweek (3 noches)':'Extraweek (4 noches)'}  ·  ${total} pasajero${total>1?'s':''}  ·  ${paseLabel(paseAdult)}`;
+  results.className='results show';
+  results.scrollIntoView({behavior:'smooth',block:'start'});
+
+  // Guardar para PDF
+  const nombreCliente = document.getElementById('nombre-cliente').value.trim();
+  ultimaCotizacion = { salida: s, opciones, paseAdult, totalPax: total, nombreCliente, paxSnap: {adult: pax.adult, minor: pax.minor} };
+  // Guardar en Supabase
+  guardarCotizacion(s, opciones, paseAdult, total, nombreCliente);
+}
+
+// ══════════════════════════════════════════════════════
+// GUARDAR DATOS PARA PDF
+// ══════════════════════════════════════════════════════
+
+function generarPDF() {
+  if (!ultimaCotizacion) return;
+  const { salida, opciones, paseAdult, totalPax, nombreCliente, paxSnap } = ultimaCotizacion;
+  const pax = paxSnap;
+
+  const tipoSemana = salida.tipo === 'mini' ? 'Miniweek (3 noches)' : 'Extraweek (4 noches)';
+    const incluyeItems = [
+      '🚌 Bus coche cama con cena caliente a la ida y desayuno',
+      '🏠 Alojamiento según selección en departamentos o apart hotel Delphos o Géminis',
+      opt => opt.pases > 0 ? '⛷️ Medios de elevación según categoría seleccionada' : null,
+      '🛡️ Seguro del viajero',
+      '👤 Coordinador permanente',
+    ];
+    const incluyeLabel = incluyeItems
+      .map(i => typeof i === 'function' ? i(opciones[0]) : i)
+      .filter(Boolean)
+      .join('<br>');
+
+  const filas = opciones.map(opt => {
+    return opt.paxPrecios.map((pp, i) => {
+      const firstCell = i===0 ? '<td style="padding:10px 16px;border-bottom:1px solid #eee;font-weight:700;font-size:12px;" rowspan="'+opt.paxPrecios.length+'">'+opt.nombre+'</td>' : '';
+      return `<tr>${firstCell}<td style="padding:10px 16px;border-bottom:1px solid #eee;font-size:11px;color:#666;">${pp.label.trim()} · ${fmt(pp.paquete)}</td><td style="padding:10px 16px;border-bottom:1px solid #eee;font-size:11px;color:#666;">${pp.pase > 0 ? fmt(pp.pase) : '—'}</td><td style="padding:10px 16px;border-bottom:1px solid #eee;font-weight:900;font-size:14px;color:#FF6264;text-align:right;">${fmt(pp.total)}</td></tr>`;
+    }).join('');
+  }).join('');
+
+  const html = `
+<style>*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}</style>
+
+<div style="font-family:'Montserrat',sans-serif;color:#1a1a2e;max-width:700px;margin:0 auto;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+
+  <!-- HEADER -->
+
+  <div style="background:#FF6264;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <div style="font-size:18px;font-weight:900;color:white;">Ône<br>TRIP</div>
+    </div>
+    <div style="text-align:right;color:white;">
+      <div style="font-size:7px;letter-spacing:3px;text-transform:uppercase;opacity:.75;margin-bottom:4px;">Cotización · Temporada 2026</div>
+      <div style="font-size:20px;font-weight:900;">Las <span style="color:#FFC630;">Leñas</span></div>
+    </div>
+  </div>
+
+  <!-- IMAGEN SKI -->
+
+  <div style="position:relative;height:180px;overflow:hidden;">
+    <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=700&q=75"
+         style="width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;"/>
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0),rgba(26,26,46,0.5));"></div>
+    <div style="position:absolute;bottom:16px;left:24px;color:white;">
+      <div style="font-size:9px;font-weight:300;letter-spacing:3px;text-transform:uppercase;opacity:0.85;">Mendoza · Argentina</div>
+      <div style="font-size:19px;font-weight:900;margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.5);">Temporada de Ski 2026</div>
+    </div>
+  </div>
+
+```
+<!-- CONTENIDO -->
+```
+
+  <div style="padding:24px 28px;">
+
+```
+<!-- CLIENTE -->
+${nombreCliente ? `<div style="background:#fff0f0;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+  <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#FF6264;">Para:</div>
+  <div style="font-size:16px;font-weight:900;">${nombreCliente}</div>
+</div>` : ''}
+
+<!-- INFO SALIDA -->
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:22px;">
+  <div style="background:#f5f5f7;border-radius:10px;padding:12px 14px;">
+    <div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aaa;margin-bottom:4px;">Fecha de salida</div>
+    <div style="font-size:14px;font-weight:900;">${salida.dia}<br>${salida.salida}/2026</div>
+  </div>
+  <div style="background:#f5f5f7;border-radius:10px;padding:12px 14px;">
+    <div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aaa;margin-bottom:4px;">Tipo</div>
+    <div style="font-size:13px;font-weight:900;">${tipoSemana}</div>
+  </div>
+  <div style="background:#f5f5f7;border-radius:10px;padding:12px 14px;">
+    <div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aaa;margin-bottom:4px;">Temporada</div>
+    <div style="font-size:13px;font-weight:900;">${salida.temp}</div>
+  </div>
+  <div style="background:#f5f5f7;border-radius:10px;padding:12px 14px;">
+    <div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aaa;margin-bottom:4px;">Pasajeros</div>
+    <div style="font-size:14px;font-weight:900;">${totalPax} persona${totalPax>1?'s':''}</div>
+  </div>
+</div>
+
+<!-- TABLA -->
+<div style="font-size:9px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#aaa;margin-bottom:8px;">Opciones cotizadas</div>
+<table style="width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+  <thead>
+    <tr style="background:#1a1a2e;">
+      <th style="padding:10px 14px;text-align:left;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:white;">Alojamiento</th>
+      <th style="padding:10px 14px;text-align:left;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aaa;">Paquete</th>
+      <th style="padding:10px 14px;text-align:left;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aaa;">Pases</th>
+      <th style="padding:10px 14px;text-align:right;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ffaaac;">Total p/persona</th>
+    </tr>
+  </thead>
+  <tbody style="background:white;">${filas}</tbody>
+</table>
+
+<!-- INCLUYE -->
+<div style="margin-top:16px;background:#fff8f8;border:1.5px solid #ffcccc;border-radius:10px;padding:14px 16px;">
+  <div style="font-size:7px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#FF6264;margin-bottom:8px;">¿Qué incluye?</div>
+  <div style="font-size:10px;color:#555;line-height:2;">${incluyeLabel}</div>
+</div>
+
+<!-- NOTAS -->
+<div style="margin-top:12px;font-size:8px;color:#aaa;line-height:1.9;">
+  · Precios por persona en pesos argentinos con IVA incluido.<br>
+  · Menores de 12 años: consultar tarifa.<br>
+  · Universitarios: presentar certificado de alumno regular en Las Leñas.<br>
+  · Sujeto a disponibilidad al momento de la reserva.
+</div>
+```
+
+  </div>
+
+  <!-- FOOTER -->
+
+  <div style="background:#FF6264;padding:10px 28px;display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+    <div>
+      <div style="font-size:14px;font-weight:900;color:white;">Ône TRIP</div>
+    </div>
+    <div style="color:rgba(255,255,255,0.75);font-size:8px;">www.onetrip.com &nbsp;·&nbsp; info@onetrip.com.ar</div>
+    <div style="color:#FFC630;font-size:8px;font-weight:700;">y no paras de viajar.</div>
+  </div>
+</div>`;
+
+// Guardar contenido original
+const originalContent = document.body.innerHTML;
+
+// Reemplazar toda la página con el PDF
+document.body.innerHTML = `<div style="position:fixed;top:0;left:0;right:0;background:#1a1a2e;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;z-index:999;"> <button onclick="location.reload()" style="background:none;border:1px solid #555;color:white;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;font-family:Montserrat,sans-serif;cursor:pointer;">← Volver</button> <span style="color:white;font-size:10px;font-weight:700;letter-spacing:1px;">Compartir desde Safari ↑</span> </div> <div style="padding-top:50px;">${html}</div>`;
+window.scrollTo(0,0);
+}
+
+// ══════════════════════════════════════════════════════
+init();
+changePax(‘adult’,0);
+renderPaseSelectors();
+
+// ══════════════════════════════════════════════════════
+// SUPABASE — Auth + Cotizaciones
+// ══════════════════════════════════════════════════════
+async function checkSession() {
+const { data: { session } } = await supa.auth.getSession();
+if (session) {
+currentUser = session.user;
+await loadUserProfile();
+showApp();
+}
+}
+
+async function loadUserProfile() {
+const { data } = await supa.from(‘vendedores’).select(‘nombre’).eq(‘id’, currentUser.id).single();
+const nombre = data?.nombre || currentUser.email.split(’@’)[0];
+document.getElementById(‘user-name-display’).textContent = nombre;
+}
+
+function showApp() {
+document.getElementById(‘login-screen’).style.display = ‘none’;
+document.getElementById(‘user-bar’).style.display = ‘flex’;
+}
+
+function toggleMode() {
+isRegisterMode = !isRegisterMode;
+document.getElementById(‘login-sub’).textContent = isRegisterMode ? ‘Creá tu cuenta’ : ‘Ingresá con tu cuenta’;
+document.getElementById(‘login-btn’).textContent = isRegisterMode ? ‘Registrarse’ : ‘Ingresar’;
+document.getElementById(‘login-toggle’).textContent = isRegisterMode ? ‘¿Ya tenés cuenta? Ingresá’ : ‘¿No tenés cuenta? Registrate’;
+document.getElementById(‘reg-nombre’).style.display = isRegisterMode ? ‘block’ : ‘none’;
+document.getElementById(‘login-err’).style.display = ‘none’;
+}
+
+async function doAuth() {
+const email = document.getElementById(‘login-email’).value.trim();
+const pass  = document.getElementById(‘login-pass’).value;
+const btn   = document.getElementById(‘login-btn’);
+const err   = document.getElementById(‘login-err’);
+
+if (!email || !pass) { err.textContent = ‘Completá email y contraseña.’; err.style.display=‘block’; return; }
+
+if (typeof supabase === ‘undefined’ || !supa) {
+err.textContent = ‘Error de conexión. Recargá la página.’;
+err.style.display=‘block’;
+return;
+}
+
+btn.disabled = true; btn.textContent = ‘Cargando…’;
+err.style.display = ‘none’;
+
+if (isRegisterMode) {
+const nombre = document.getElementById(‘reg-nombre’).value.trim();
+if (!nombre) { err.textContent = ‘Ingresá tu nombre.’; err.style.display=‘block’; btn.disabled=false; btn.textContent=‘Registrarse’; return; }
+const { data, error } = await supa.auth.signUp({ email, password: pass });
+if (error) { err.textContent = error.message; err.style.display=‘block’; btn.disabled=false; btn.textContent=‘Registrarse’; return; }
+// Save nombre in vendedores table
+await supa.from(‘vendedores’).upsert({ id: data.user.id, email, nombre });
+currentUser = data.user;
+document.getElementById(‘user-name-display’).textContent = nombre;
+showApp();
+} else {
+const { data, error } = await supa.auth.signInWithPassword({ email, password: pass });
+if (error) { err.textContent = ‘Email o contraseña incorrectos.’; err.style.display=‘block’; btn.disabled=false; btn.textContent=‘Ingresar’; return; }
+currentUser = data.user;
+await loadUserProfile();
+showApp();
+}
+btn.disabled=false;
+}
+
+async function logout() {
+await supa.auth.signOut();
+currentUser = null;
+document.getElementById(‘login-screen’).style.display=‘flex’;
+document.getElementById(‘user-bar’).style.display=‘none’;
+document.getElementById(‘results’).className=‘results’;
+}
+
+async function guardarCotizacion(salida, opciones, paseAdult, totalPax, nombreCliente) {
+if (!currentUser) return;
+const rows = opciones.map(opt => ({
+vendedor_id: currentUser.id,
+cliente: nombreCliente || ‘Sin nombre’,
+fecha_salida: salida.salida + ‘/2026’,
+tipo_semana: salida.tipo === ‘mini’ ? ‘Miniweek’ : ‘Extraweek’,
+temporada: salida.temp,
+alojamiento: opt.nombre,
+pase: paseAdult,
+pasajeros: totalPax,
+precio_paquete: opt.aloj,
+precio_pases: opt.pases,
+precio_total: opt.precio,
+created_at: new Date().toISOString()
+}));
+await supa.from(‘cotizaciones’).insert(rows);
+}
+
+async function verHistorial() {
+document.getElementById(‘hist-overlay’).style.display=‘flex’;
+document.getElementById(‘hist-list’).innerHTML = ‘<div style="text-align:center;padding:20px;color:#aaa;font-size:12px;">Cargando…</div>’;
+
+const { data, error } = await supa.from(‘cotizaciones’)
+.select(’*’)
+.eq(‘vendedor_id’, currentUser.id)
+.order(‘created_at’, { ascending: false })
+.limit(50);
+
+if (!data || data.length === 0) {
+document.getElementById(‘hist-list’).innerHTML = ‘<div class="hist-empty">No tenés cotizaciones guardadas aún.</div>’;
+return;
+}
+
+const html = data.map(c => {
+const fechaCotiz = new Date(c.created_at).toLocaleDateString(‘es-AR’, {day:‘2-digit’,month:‘2-digit’,year:‘numeric’,hour:‘2-digit’,minute:‘2-digit’});
+return ` <div class="hist-item"> <div class="hist-item-top"> <div> <div class="hist-cliente">${c.cliente}</div> <div class="hist-fecha-cotiz">Cotizado el ${fechaCotiz}</div> </div> <div class="hist-precio">${fmt(c.precio_total)}</div> </div> <div class="hist-detalles"> ${c.alojamiento} · ${c.fecha_salida} · ${c.tipo_semana} · ${c.temporada} · ${c.pasajeros} pax </div> </div>`;
+}).join(’’);
+document.getElementById(‘hist-list’).innerHTML = html;
+}
+
+// Check session on load
+checkSession();
+
+</script>
+</body>
+</html>
