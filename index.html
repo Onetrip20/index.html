@@ -754,7 +754,8 @@ function cotizar() {
             <div class="opt-type">${opt.tipo} · ${s.dia} ${s.salida}/2026 · ${s.temp}</div>
           </div>
           <div class="opt-price" style="text-align:right;flex-shrink:0;">
-            ${opt.paxPrecios.map(pp => `
+            ${opt.paxPrecios.map(pp => '<div style="display:flex;justify-content:flex-end;align-items:baseline;gap:6px;margin-bottom:2px;"><span style="font-size:9px;color:#aaa;font-weight:700;text-transform:uppercase;">'+pp.label.trim()+'</span><span style="font-size:18px;font-weight:900;color:#FF6264;">'+fmt(pp.total)+'</span></div>').join('')}
+
               <div style="display:flex;justify-content:flex-end;align-items:baseline;gap:6px;margin-bottom:2px;">
                 <span style="font-size:9px;color:#aaa;font-weight:700;text-transform:uppercase;">${pp.label.trim()}</span>
                 <span style="font-size:18px;font-weight:900;color:#FF6264;">${fmt(pp.total)}</span>
@@ -764,7 +765,8 @@ function cotizar() {
           </div>
         </div>
         <div class="opt-desglose">
-          ${opt.paxPrecios.map(pp => `
+          ${opt.paxPrecios.map(pp => '<div class="opt-desglose-item" style="min-width:calc(50% - 4px);"><div class="dl">'+pp.label.trim()+' · Paquete</div><div class="dv">'+fmt(pp.paquete)+'</div></div><div class="opt-desglose-item" style="min-width:calc(50% - 4px);"><div class="dl">'+pp.label.trim()+' · Pase</div><div class="dv">'+(pp.pase > 0 ? fmt(pp.pase) : 'Sin pase')+'</div></div>').join('')}
+
             <div class="opt-desglose-item" style="min-width:calc(50% - 4px);">
               <div class="dl">${pp.label.trim()} · Paquete</div>
               <div class="dv">${fmt(pp.paquete)}</div>
