@@ -758,31 +758,12 @@ function cotizar() {
 
               <div style="display:flex;justify-content:flex-end;align-items:baseline;gap:6px;margin-bottom:2px;">
                 <span style="font-size:9px;color:#aaa;font-weight:700;text-transform:uppercase;">${pp.label.trim()}</span>
-                <span style="font-size:18px;font-weight:900;color:#FF6264;">${fmt(pp.total)}</span>
-              </div>
-        
-            <div style="font-size:8px;color:#aaa;text-align:right;margin-top:2px;">por persona · IVA incl.</div>
-          </div>
-        </div>
-        <div class="opt-desglose">
-          ${opt.paxPrecios.map(pp => '<div class="opt-desglose-item" style="min-width:calc(50% - 4px);"><div class="dl">'+pp.label.trim()+' · Paquete</div><div class="dv">'+fmt(pp.paquete)+'</div></div><div class="opt-desglose-item" style="min-width:calc(50% - 4px);"><div class="dl">'+pp.label.trim()+' · Pase</div><div class="dv">'+(pp.pase > 0 ? fmt(pp.pase) : 'Sin pase')+'</div></div>').join('')}
-
-            <div class="opt-desglose-item" style="min-width:calc(50% - 4px);">
-              <div class="dl">${pp.label.trim()} · Paquete</div>
-              <div class="dv">${fmt(pp.paquete)}</div>
-            </div>
-            <div class="opt-desglose-item" style="min-width:calc(50% - 4px);">
-              <div class="dl">${pp.label.trim()} · Pase</div>
-              <div class="dv">${pp.pase > 0 ? fmt(pp.pase) : 'Sin pase'}</div>
-            </div>
-          `).join('')}
-        </div>
+                </div>
       `;
       grid.appendChild(card);
     });
   }
-
-  const results = document.getElementById('results');
+const results = document.getElementById('results');
   const badge = document.getElementById('res-badge');
   badge.textContent = s.temp;
   badge.className = 'badge '+tempBadgeClass(s.temp);
@@ -791,18 +772,15 @@ function cotizar() {
     `${s.dia} ${s.salida}/2026  ·  ${s.tipo==='mini'?'Miniweek (3 noches)':'Extraweek (4 noches)'}  ·  ${total} pasajero${total>1?'s':''}  ·  ${paseLabel(paseAdult)}`;
   results.className='results show';
   results.scrollIntoView({behavior:'smooth',block:'start'});
-
-  // Guardar para PDF
+// Guardar para PDF
   const nombreCliente = document.getElementById('nombre-cliente').value.trim();
   ultimaCotizacion = { salida: s, opciones, paseAdult, totalPax: total, nombreCliente, paxSnap: {adult: pax.adult, minor: pax.minor} };
   // Guardar en Supabase
   guardarCotizacion(s, opciones, paseAdult, total, nombreCliente);
 }
-
 // ══════════════════════════════════════════════════════
 // GUARDAR DATOS PARA PDF
 // ══════════════════════════════════════════════════════
-
 function generarPDF() {
   if (!ultimaCotizacion) return;
   const { salida, opciones, paseAdult, totalPax, nombreCliente, paxSnap } = ultimaCotizacion;
