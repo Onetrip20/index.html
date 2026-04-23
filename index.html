@@ -788,8 +788,36 @@ function cotizar() {
 // ══════════════════════════════════════════════════════
 
 function generarPDF() {
-  alert('PDF proximamente disponible.');
-}
+  if (!ultimaCotizacion) return;
+  var s = ultimaCotizacion.salida;
+  var ops = ultimaCotizacion.opciones;
+  var tp = ultimaCotizacion.totalPax;
+  var nc = ultimaCotizacion.nombreCliente;
+  var ts = s.tipo === 'mini' ? 'Miniweek (3 noches)' : 'Extraweek (4 noches)';
+  var fi = '';
+  ops.forEach(function(opt) {
+    opt.paxPrecios.forEach(function(pp, i) {
+      var fc = i === 0 ? '<td rowspan="' + opt.paxPrecios.length + '" style="padding:10px;border-bottom:1px solid #eee;font-weight:700;">' + opt.nombre + '</td>' : '';
+      fi += '<tr>' + fc + '<td style="padding:10px;border-bottom:1px solid #eee;font-size:11px;">' + pp.label.trim() + ' - ' + fmt(pp.paquete) + '</td><td style="padding:10px;border-bottom:1px solid #eee;font-size:11px;">' + (pp.pase > 0 ? fmt(pp.pase) : '-') + '</td><td style="padding:10px;border-bottom:1px solid #eee;font-weight:900;color:#FF6264;text-align:right;">' + fmt(pp.total) + '</td></tr>';
+    });
+  });
+  var cl = nc ? '<div style="background:#fff0f0;padding:12px;border-radius:10px;margin-bottom:16px;"><b style="color:#FF6264;">Para: </b>' + nc + '</div>' : '';
+  var h = '<style>*{font-family:sans-serif;-webkit-print-color-adjust:exact!important;}</style><div style="max-width:700px;margin:0 auto;">';
+  h += '<div style="background:#FF6264;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;">';
+  h += '<div style="font-size:18px;font-weight:900;color:white;">one<br>TRIP</div>';
+  h += '<div style="text-align:right;color:white;"><div style="font-size:7px;letter-spacing:2px;opacity:.8;">COTIZACION 2026</div><div style="font-size:20px;font-weight:900;">Las <span style="color:#FFC630;">Lenas</span></div></div></div>';
+  h += '<div style="padding:24px 28px;">' + cl;
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:20px;">';
+  h += '<div style="background:#f5f5f7;padding:12px;border-radius:10px;"><div style="font-size:7px;color:#aaa;margin-bottom:4px;">SALIDA</div><div style="font-weight:900;">' + s.dia + ' ' + s.salida + '/2026</div></div>';
+  h += '<div style="background:#f5f5f7;padding:12px;border-radius:10px;"><div style="font-size:7px;color:#aaa;margin-bottom:4px;">TIPO</div><div style="font-weight:900;">' + ts + '</div></div>';
+  h += '<div style="background:#f5f5f7;padding:12px;border-radius:10px;"><div style="font-size:7px;color:#aaa;margin-bottom:4px;">TEMPORADA</div><div style="font-weight:900;">' + s.temp + '</div></div>';
+  h += '<div style="background:#f5f5f7;padding:12px;border-radius:10px;"><div style="font-size:7px;color:#aaa;margin-bottom:4px;">PASAJEROS</div><div style="font-weight:900;">' + tp + '</div></div></div>';
+  h += '<table style="width:100%;border-collapse:collapse;margin-bottom:16px;"><thead><tr style="background:#1a1a2e;"><th style="padding:10px;text-align:left;color:white;font-size:9px;">Alojamiento</th><th style="padding:10px;text-align:left;color:#aaa;font-size:9px;">Paquete</th><th style="padding:10px;text-align:left;color:#aaa;font-size:9px;">Pases</th><th style="padding:10px;text-align:right;color:#ffaaac;font-size:9px;">Total p/persona</th></tr></thead><tbody>' + fi + '</tbody></table>';
+  h += '<div style="background:#fff8f8;border:1px solid #ffcccc;border-radius:10px;padding:14px;margin-bottom:12px;"><div style="font-size:7px;font-weight:900;color:#FF6264;margin-bottom:8px;">QUE INCLUYE</div>';
+  h += '<div style="font-size:10px;color:#555;line-height:1.8;">Bus coche cama con cena y desayuno<br>Alojamiento segun seleccion<br>Medios de elevacion segun categoria<br>Seguro del viajero<br>Coordinador permanente</div></div>';
+  h += '<div style="font-size:8px;color:#aaa;">Precios por persona con IVA. Sujeto a disponibilidad.</div></div>';
+  h += '<div style="background:#FF6264;padding:10px 28px;display:flex;justify-content:space-between;align-items:center;"><div style="font-weight:900;color:white;">one TRIP</div><div style="color:rgba(255,255,255,.75);font-size:8px;">www.onetrip.com</div><div style="color:#FFC630;font-size:8px;font-weight:700;">y no paras de via​​​​​​​​​​​​​​​​
+
 
 // ══════════════════════════════════════════════════════
 init();
