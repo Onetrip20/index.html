@@ -806,7 +806,8 @@ function cotizar() {
   mostrarPantallaResultados(s, opciones, total, nombreCliente);
 }
 
-function mostrarPantallaResultados(s, opciones, total, nombreCliente) {
+function mostrarPantallaResultados(s, opciones, total, nombreCliente) {  var ts = s.tipo === 'mini' ? 'Miniweek (3 noches)' : 'Extraweek (4 noches)';  var cardsHTML = '';  opciones.forEach(function(opt) {    var desglose = '';    opt.paxPrecios.forEach(function(pp) {      desglose += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;"><span style="font-size:11px;color:#666;">' + pp.label.trim() + ' - ' + fmt(pp.paquete) + ' - ' + (pp.pase > 0 ? fmt(pp.pase) : 'Sin pase') + '</span><span style="font-size:14px;font-weight:900;color:#FF6264;">' + fmt(pp.total) + '</span></div>';    });    cardsHTML += '<div style="background:white;border-radius:14px;padding:16px;margin-bottom:12px;"><div style="font-size:13px;font-weight:900;">' + opt.nombre + '</div><div style="font-size:9px;color:#aaa;margin-bottom:8px;">' + opt.tipo + '</div>' + desglose + '</div>';  });  var cl = nombreCliente ? '<div style="background:#fff0f0;border-radius:10px;padding:10px;margin-bottom:16px;"><b style="color:#FF6264;">Para: </b>' + nombreCliente + '</div>' : '';  var overlay = document.createElement('div');  overlay.id = 'resultado-overlay';  overlay.style.cssText = 'position:fixed;inset:0;background:#f2f3f7;z-index:9999;overflow-y:auto;';  overlay.innerHTML = '<div style="background:#FF6264;padding:14​​​​​​​​​​​​​​​​
+
   var ts = s.tipo === 'mini' ? 'Miniweek (3 noches)' : 'Extraweek (4 noches)';
   var cardsHTML = '';
   opciones.forEach(function(opt) {
