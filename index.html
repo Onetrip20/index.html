@@ -794,6 +794,7 @@ function cotizar() {
   document.getElementById('res-sub').textContent =
     `${s.dia} ${s.salida}/2026  ·  ${s.tipo==='mini'?'Miniweek (3 noches)':'Extraweek (4 noches)'}  ·  ${total} pasajero${total>1?'s':''}  ·  ${paseLabel(paseAdult)}`;
   results.className='results show';
+  mostrarPantallaResultados(s, opciones, total, nombreCliente);
 
   // Guardar para PDF
   const nombreCliente = document.getElementById('nombre-cliente').value.trim();
