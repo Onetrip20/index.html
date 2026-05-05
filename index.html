@@ -274,7 +274,7 @@ body *{visibility:hidden;}
     <div class="info-box">
       ⚠️ <span>Precios <strong>por persona</strong> en pesos argentinos con IVA incluido. Incluye alojamiento, bus, transfer, seguro, coordinación y pase de ski según categoría seleccionada.</span>
     </div>
-    <button class="btn-pdf" onclick="generarPDF()" id="btn-pdf">📄 &nbsp; Descargar cotización para el cliente</button>
+    <button class="btn-pdf" onclick="generarPDF()" id="btn-pdf">📋 &nbsp; Ver cotización para compartir</button>
   </div>
 
   <!-- PDF oculto para imprimir -->
@@ -794,13 +794,68 @@ function cotizar() {
   document.getElementById('res-sub').textContent =
     `${s.dia} ${s.salida}/2026  ·  ${s.tipo==='mini'?'Miniweek (3 noches)':'Extraweek (4 noches)'}  ·  ${total} pasajero${total>1?'s':''}  ·  ${paseLabel(paseAdult)}`;
   results.className='results show';
-  results.scrollIntoView({behavior:'smooth',block:'start'});
 
   // Guardar para PDF
   const nombreCliente = document.getElementById('nombre-cliente').value.trim();
   ultimaCotizacion = { salida: s, opciones, paseAdult, totalPax: total, nombreCliente, paxSnap: {adult: pax.adult, minor: pax.minor} };
   // Guardar en Supabase
   guardarCotizacion(s, opciones, paseAdult, total, nombreCliente);
+
+  // Mostrar pantalla completa de resultados
+  mostrarPantallaResultados(s, opciones, total, nombreCliente);
+}
+
+function mostrarPantallaResultados(s, opciones, total, nombreCliente) {
+  var ts = s.tipo === 'mini' ? 'Miniweek (3 noches)' : 'Extraweek (4 noches)';
+  var cardsHTML = '';
+  opciones.forEach(function(opt) {
+    var desglose = '';
+    opt.paxPrecios.forEach(function(pp) {
+      desglose += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;">';
+      desglose += '<span style="font-size:11px;color:#666;">' + pp.label.trim() + ' · Paquete: ' + fmt(pp.paquete) + ' · Pase: ' + (pp.pase > 0 ? fmt(pp.pase) : 'Sin pase') + '</span>';
+      desglose += '<span style="font-size:14px;font-weight:900;color:#FF6264;">' + fmt(pp.total) + '</span>';
+      desglose += '</div>';
+    });
+    cardsHTML += '<div style="background:white;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">';
+    cardsHTML += '<div style="font-size:13px;font-weight:900;margin-bottom:4px;">' + opt.nombre + '</div>';
+    cardsHTML += '<div style="font-size:9px;color:#aaa;margin-bottom:12px;">' + opt.tipo + ' · ' + s.dia + ' ' + s.salida + '/2026 · ' + s.temp + '</div>';
+    cardsHTML += desglose;
+    cardsHTML += '</div>';
+  });
+
+  var clienteHTML = nombreCliente ? '<div style="background:#fff0f0;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:13px;"><b style="color:#FF6264;">Para: </b>' + nombreCliente + '</div>' : '';
+
+  var overlay = document.createElement('div');
+  overlay.id = 'resultado-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:#f2f3f7;z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;';
+  overlay.innerHTML =
+    '<div style="background:#FF6264;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;">' +
+    '<button onclick="document.getElementById(\'resultado-overlay\').remove()" style="background:none;border:none;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Montserrat,sans-serif;padding:4px 8px;">← Volver</button>' +
+    '<div style="text-align:right;color:white;"><div style="font-size:7px;letter-spacing:2px;opacity:.8;">COTIZACION 2026</div><div style="font-size:16px;font-weight:900;">Las <span style="color:#FFC630;">Leñas</span></div></div>' +
+    '</div>' +
+    '<div style="position:relative;height:160px;overflow:hidden;">' +
+    '<img src="https://onetrip20.github.io/index.html/IMG_0387.jpeg" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;"/>' +
+    '<div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0),rgba(26,26,46,0.5));"></div>' +
+    '<div style="position:absolute;bottom:12px;left:20px;color:white;"><div style="font-size:8px;letter-spacing:3px;opacity:.85;">Mendoza · Argentina</div><div style="font-size:17px;font-weight:900;">Temporada de Ski 2026</div></div>' +
+    '</div>' +
+    '<div style="padding:16px;">' +
+    clienteHTML +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">' +
+    '<div style="background:white;padding:10px;border-radius:10px;"><div style="font-size:7px;color:#aaa;">SALIDA</div><div style="font-weight:900;font-size:12px;">' + s.dia + ' ' + s.salida + '/2026</div></div>' +
+    '<div style="background:white;padding:10px;border-radius:10px;"><div style="font-size:7px;color:#aaa;">TIPO</div><div style="font-weight:900;font-size:12px;">' + ts + '</div></div>' +
+    '<div style="background:white;padding:10px;border-radius:10px;"><div style="font-size:7px;color:#aaa;">TEMPORADA</div><div style="font-weight:900;font-size:12px;">' + s.temp + '</div></div>' +
+    '<div style="background:white;padding:10px;border-radius:10px;"><div style="font-size:7px;color:#aaa;">PASAJEROS</div><div style="font-weight:900;font-size:12px;">' + total + '</div></div>' +
+    '</div>' +
+    cardsHTML +
+    '<div style="background:#fffbea;border:1px solid #ffe58f;border-radius:10px;padding:10px 14px;font-size:10px;color:#856404;margin-bottom:16px;">⚠️ Precios <b>por persona</b> en pesos argentinos con IVA incluido. Incluye alojamiento, bus, transfer, seguro, coordinación y pase de ski según categoría.</div>' +
+    '<div style="background:#1a1a2e;border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">' +
+    '<div style="color:white;font-size:10px;font-weight:700;">Compartir desde Safari ↑</div>' +
+    '<div style="color:#FFC630;font-size:9px;">www.onetrip.com</div>' +
+    '</div>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+  window.scrollTo(0, 0);
 }
 
 // ══════════════════════════════════════════════════════
@@ -810,25 +865,6 @@ function cotizar() {
 function generarPDF() {
   if (!ultimaCotizacion) return;
   var s = ultimaCotizacion.salida;
-  var ops = ultimaCotizacion.opciones;
-  var tp = ultimaCotizacion.totalPax;
-  var nc = ultimaCotizacion.nombreCliente;
-  var ts = s.tipo === 'mini' ? 'Miniweek (3 noches)' : 'Extraweek (4 noches)';
-  var hasPase = ops.some(function(o){return o.paxPrecios.some(function(p){return p.pase>0;});});
-  var fi = '';
-  ops.forEach(function(opt) {
-    opt.paxPrecios.forEach(function(pp, i) {
-      var fc = i === 0 ? '<td rowspan="' + opt.paxPrecios.length + '" style="padding:10px;border-bottom:1px solid #eee;font-weight:700;">' + opt.nombre + '</td>' : '';
-      fi += '<tr>' + fc + '<td style="padding:10px;border-bottom:1px solid #eee;font-size:11px;">' + pp.label.trim() + ' - ' + fmt(pp.paquete) + '</td><td style="padding:10px;border-bottom:1px solid #eee;font-size:11px;">' + (pp.pase > 0 ? fmt(pp.pase) : '-') + '</td><td style="padding:10px;border-bottom:1px solid #eee;font-weight:900;color:#FF6264;text-align:right;">' + fmt(pp.total) + '</td></tr>';
-    });
-  });
-  var cl = nc ? '<div style="background:#fff0f0;padding:12px;border-radius:10px;margin-bottom:16px;"><b style="color:#FF6264;">Para: </b>' + nc + '</div>' : '';
-  var h = '<style>*{font-family:sans-serif;-webkit-print-color-adjust:exact!important;}</style><div style="max-width:700px;margin:0 auto;">';
-  h += '<div style="background:#FF6264;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;">';
-  h += '<img src="https://onetrip20.github.io/index.html/Logo_One_Trip_1.png" style="height:36px;filter:brightness(0) invert(1);"/>';
-  h += '<div style="text-align:right;color:white;"><div style="font-size:7px;letter-spacing:2px;opacity:.8;">COTIZACION 2026</div><div style="font-size:20px;font-weight:900;">Las <span style="color:#FFC630;">Lenas</span></div></div></div>';
-  h += '<div style="position:relative;height:150px;overflow:hidden;">
-
   var ops = ultimaCotizacion.opciones;
   var tp = ultimaCotizacion.totalPax;
   var nc = ultimaCotizacion.nombreCliente;
