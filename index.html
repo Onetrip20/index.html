@@ -271,7 +271,11 @@ select:disabled{opacity:.35;cursor:not-allowed;}
     <div class="info-box">
       ⚠️ <span>Precios <strong>por persona</strong> en pesos argentinos con IVA incluido. Incluye alojamiento, bus, transfer, seguro, coordinación y pase de ski según categoría seleccionada.</span>
     </div>
-    <button class="btn-pdf" onclick="generarPDF()" id="btn-pdf">📋 &nbsp; Ver cotización para compartir</button>
+    <div style="margin-top:14px;">
+  <label style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#999;">Comentarios y aclaraciones</label>
+  <textarea id="comentarios-vendedor" placeholder="Escribí aquí comentarios o aclaraciones para el cliente..." style="width:100%;border:1.5px solid #e2e4ec;border-radius:10px;padding:10px 14px;font-family:'Montserrat',sans-serif;font-size:12px;color:#1a1a2e;margin-top:6px;min-height:80px;resize:vertical;"></textarea>
+</div>
+<button class="btn-pdf" onclick="generarPDF()" id="btn-pdf">Ver cotizacion para compartir</button>
   </div>
 
   <!-- PDF oculto para imprimir -->
