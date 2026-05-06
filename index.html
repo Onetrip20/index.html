@@ -611,6 +611,10 @@ function cotizar() {
   const total = pax.adult + pax.minor;
 
   if (idx===''||!tipoSel) { alert('Seleccioná fecha y tipo de semana.'); return; }
+  if ((tipoSel==='teca'||tipoSel==='dormis') && total < 4) {
+    alert('Para TECA y Dormis el mínimo es 4 pasajeros. Podés agregar personas hasta completar 4, o abonar el suplemento por cama extra.');
+    return;
+  }
 
   const s = SALIDAS[+idx];
   const data = s.tipo==='mini' ? TECA_MINI : TECA_EXTRA;
